@@ -486,7 +486,78 @@
             font-size: 14px;
             margin-top: 5px;
         }
+        /* ========== ASSET THUMBNAIL STYLES ========== */
+.asset-thumbnail-container {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
 
+.asset-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.asset-thumb:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
+    z-index: 10;
+}
+
+.asset-thumb-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background: var(--light);
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.asset-thumb-placeholder:hover {
+    background: var(--gray-light);
+    color: var(--primary);
+}
+
+.asset-thumb-more {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.asset-thumb-more:hover {
+    background: var(--primary);
+}
+
+.asset-thumb-badge {
+    position: relative;
+}
+
+.asset-thumb-badge .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 10px;
+    padding: 2px 6px;
+}
         /* BADGES */
         .badge {
             padding: 4px 12px;
@@ -711,6 +782,67 @@
         }
 
         /* GALLERY */
+        /* ========== GALLERY CONDITION STYLES ========== */
+.gallery-condition-baik { border-top: 4px solid #10b981; }
+.gallery-condition-rusak { border-top: 4px solid #ef4444; }
+.gallery-condition-mutasi { border-top: 4px solid #f59e0b; }
+.gallery-condition-distribusi { border-top: 4px solid #3b82f6; }
+.gallery-condition-unknown { border-top: 4px solid #9ca3af; }
+
+.gallery-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.gallery-item .badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.gallery-image {
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-image {
+    transform: scale(1.05);
+}
+
+/* Filter by condition (opsional) */
+.gallery-filter-condition {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.condition-filter-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.condition-filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.condition-filter-btn[data-condition="baik"]:hover { background: #10b98120; }
+.condition-filter-btn[data-condition="rusak"]:hover { background: #ef444420; }
+.condition-filter-btn[data-condition="Mutasi"]:hover { background: #f59e0b20; }
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1546,6 +1678,33 @@
         min-width: auto;
     }
 }
+@media print {
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #assetDetailModal,
+    #assetDetailModal * {
+        visibility: visible !important;
+    }
+
+    #assetDetailModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+}
+
 /* Tambahkan di CSS */
 .user-badge {
     display: inline-flex;
@@ -1927,7 +2086,63 @@
         font-size: 16px !important;
     }
 }
+/* ========== ACTIVITY STYLES ========== */
+.activity-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.activity-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Warna untuk berbagai tipe aktivitas */
+.activity-condition-baik { border-left-color: #10b981 !important; }
+.activity-condition-rusak { border-left-color: #ef4444 !important; }
+.activity-condition-mutasi { border-left-color: #f59e0b !important; }
+.activity-lokasi { border-left-color: #3b82f6 !important; }
+.activity-create { border-left-color: #8b5cf6 !important; }
+.activity-update { border-left-color: #6b7280 !important; }
+
+/* Badge untuk tipe aktivitas */
+.activity-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.activity-badge-create { background: #8b5cf620; color: #8b5cf6; }
+.activity-badge-update { background: #6b728020; color: #6b7280; }
+.activity-badge-move { background: #3b82f620; color: #3b82f6; }
+.activity-badge-condition { background: #f59e0b20; color: #f59e0b; }
+
+/* Animasi untuk aktivitas baru */
+@keyframes highlightNew {
+    0% { background-color: rgba(16, 185, 129, 0.2); }
+    100% { background-color: transparent; }
+}
+
+.activity-new {
+    animation: highlightNew 2s ease;
+}
+
+/* Scrollbar untuk container aktivitas */
+#recentActivity::-webkit-scrollbar {
+    width: 6px;
+}
+
+#recentActivity::-webkit-scrollbar-track {
+    background: var(--light);
+    border-radius: 10px;
+}
+
+#recentActivity::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 10px;
+}
     </style>
 </head>
 <body>
@@ -2742,14 +2957,14 @@
         <div class="form-row">
             <div class="form-col">
                 <div class="setting-label">Versi</div>
-                <div id="appVersion" style="font-weight: 600;">3.5.4</div>
+                <div id="appVersion" style="font-weight: 600;">3.6.0</div>
                 
                 <div class="setting-label">Build Date</div>
                 <div id="buildDate" style="font-weight: 600;">20 Februari 2026</div>
                 
                 <div class="setting-label">Build Code</div>
                 <div style="font-family: monospace; font-size: 13px; color: var(--primary);">
-                    354
+                    360
                 </div>
             </div>
             <div class="form-col">
@@ -3197,9 +3412,9 @@ const CLOUDINARY_CONFIG = {
 
         
         const APP_META = {
-            VERSION: '3.5.4',
+            VERSION: '3.6.0',
             BUILD_DATE: '20 Februari 2026',
-            BUILD_CODE: 354
+            BUILD_CODE: 360
         };
 
         // Konfigurasi Keamanan & Limit
@@ -6884,101 +7099,420 @@ const MutasiCount = assets.filter(a => getEffectiveCondition(a) === 'Mutasi').le
             });
         }
         
-        function updateRecentActivity() {
+        // ==============================================
+// UPDATE RECENT ACTIVITY - VERSI DETAIL
+// ==============================================
+function updateRecentActivity() {
     const activityContainer = document.getElementById('recentActivity');
-
-    const recentUpdates = [];
-
+    
+    // Kumpulkan semua aktivitas dari semua asset
+    const allActivities = [];
+    
     assets.forEach(asset => {
-
-        if (asset.riwayat && asset.riwayat.length > 0) {
-
-            const lastHistory = asset.riwayat[asset.riwayat.length - 1];
-
-            let actionText = '';
-
-            // ======================
-            // ASSET
-            // ======================
-            if (asset.jenis_item === 'asset') {
-
-                if (lastHistory.old_kondisi !== lastHistory.new_kondisi) {
-                    actionText = `${lastHistory.old_kondisi || '-'} → ${lastHistory.new_kondisi || '-'}`;
-                } else if (lastHistory.old_lokasi !== lastHistory.new_lokasi) {
-                    actionText = `Lokasi: ${lastHistory.old_lokasi || '-'} → ${lastHistory.new_lokasi || '-'}`;
-                } else {
-                    actionText = 'Update Data';
+        if (asset.riwayat && Array.isArray(asset.riwayat) && asset.riwayat.length > 0) {
+            
+            asset.riwayat.forEach((history, index) => {
+                // Tentukan apakah ini riwayat terbaru atau bukan
+                const isLatest = (index === asset.riwayat.length - 1);
+                
+                // Format pesan berdasarkan tipe dan jenis item
+                let actionMessage = '';
+                let actionIcon = '';
+                let actionColor = '';
+                let detailInfo = '';
+                
+                // ============ ASSET ============
+                if (asset.jenis_item === 'asset') {
+                    // Cek perubahan kondisi
+                    if (history.old_kondisi && history.new_kondisi && 
+                        history.old_kondisi !== history.new_kondisi) {
+                        
+                        actionIcon = history.new_kondisi === 'baik' ? '✅' :
+                                    history.new_kondisi === 'rusak' ? '⚠️' : '🔄';
+                        
+                        actionMessage = `Perubahan Kondisi: ${history.old_kondisi || '-'} → ${history.new_kondisi || '-'}`;
+                        actionColor = history.new_kondisi === 'baik' ? '#10b981' :
+                                     history.new_kondisi === 'rusak' ? '#ef4444' : '#f59e0b';
+                        
+                        detailInfo = `Kondisi berubah dari ${history.old_kondisi || 'awal'} menjadi ${history.new_kondisi}`;
+                    }
+                    
+                    // Cek perubahan lokasi
+                    else if (history.old_lokasi && history.new_lokasi && 
+                             history.old_lokasi !== history.new_lokasi) {
+                        
+                        actionIcon = '📍';
+                        actionMessage = `Perpindahan Lokasi: ${history.old_lokasi || '-'} → ${history.new_lokasi || '-'}`;
+                        actionColor = '#3b82f6';
+                        detailInfo = `Item dipindahkan dari ${history.old_lokasi || 'awal'} ke ${history.new_lokasi}`;
+                    }
+                    
+                    // Create new asset
+                    else if (history.tipe === 'create') {
+                        actionIcon = '➕';
+                        actionMessage = `Item Baru Ditambahkan`;
+                        actionColor = '#10b981';
+                        detailInfo = `Kondisi awal: ${history.new_kondisi || asset.kondisi || '-'}`;
+                    }
+                    
+                    // Update umum
+                    else {
+                        actionIcon = '📝';
+                        actionMessage = `Data Diperbarui`;
+                        actionColor = '#6b7280';
+                        detailInfo = history.catatan || 'Update data asset';
+                    }
                 }
-
-            }
-
-            // ======================
-            // NON-ASSET
-            // ======================
-            if (asset.jenis_item === 'non-asset') {
-
-                if (lastHistory.old_jumlah && lastHistory.new_jumlah &&
-                    JSON.stringify(lastHistory.old_jumlah) !== JSON.stringify(lastHistory.new_jumlah)) {
-
-                    actionText = 'Distribusi Jumlah Berubah';
-
-                } else if (lastHistory.old_lokasi !== lastHistory.new_lokasi) {
-
-                    actionText = `Lokasi: ${lastHistory.old_lokasi || '-'} → ${lastHistory.new_lokasi || '-'}`;
-
-                } else {
-                    actionText = 'Update Data';
+                
+                // ============ NON-ASSET ============
+                else if (asset.jenis_item === 'non-asset') {
+                    // Cek perubahan distribusi jumlah
+                    if (history.old_jumlah && history.new_jumlah && 
+                        typeof history.old_jumlah === 'object' && 
+                        typeof history.new_jumlah === 'object') {
+                        
+                        const oldDetail = history.old_jumlah || {};
+                        const newDetail = history.new_jumlah || {};
+                        
+                        // Hitung perubahan
+                        const changes = [];
+                        if (oldDetail.baik !== newDetail.baik) {
+                            const diff = newDetail.baik - oldDetail.baik;
+                            changes.push(`Baik: ${diff > 0 ? '+' : ''}${diff}`);
+                        }
+                        if (oldDetail.rusak !== newDetail.rusak) {
+                            const diff = newDetail.rusak - oldDetail.rusak;
+                            changes.push(`Rusak: ${diff > 0 ? '+' : ''}${diff}`);
+                        }
+                        if (oldDetail.Mutasi !== newDetail.Mutasi) {
+                            const diff = newDetail.Mutasi - oldDetail.Mutasi;
+                            changes.push(`Mutasi: ${diff > 0 ? '+' : ''}${diff}`);
+                        }
+                        
+                        actionIcon = '📊';
+                        actionMessage = `Distribusi Berubah`;
+                        actionColor = '#8b5cf6';
+                        detailInfo = changes.join(' | ');
+                    }
+                    
+                    // Cek perubahan lokasi
+                    else if (history.old_lokasi && history.new_lokasi && 
+                             history.old_lokasi !== history.new_lokasi) {
+                        
+                        actionIcon = '📍';
+                        actionMessage = `Perpindahan Lokasi: ${history.old_lokasi || '-'} → ${history.new_lokasi || '-'}`;
+                        actionColor = '#3b82f6';
+                        detailInfo = `Item dipindahkan dari ${history.old_lokasi || 'awal'} ke ${history.new_lokasi}`;
+                    }
+                    
+                    // Create new item
+                    else if (history.tipe === 'create') {
+                        actionIcon = '➕';
+                        actionMessage = `Item Baru Ditambahkan`;
+                        actionColor = '#10b981';
+                        
+                        const jumlah = asset.total_jumlah || 
+                                       (history.new_jumlah?.baik + history.new_jumlah?.rusak + history.new_jumlah?.Mutasi) || 
+                                       0;
+                        detailInfo = `Total ${jumlah} unit (Baik: ${history.new_jumlah?.baik || 0}, Rusak: ${history.new_jumlah?.rusak || 0}, Mutasi: ${history.new_jumlah?.Mutasi || 0})`;
+                    }
+                    
+                    // Update umum
+                    else {
+                        actionIcon = '📝';
+                        actionMessage = `Data Diperbarui`;
+                        actionColor = '#6b7280';
+                        detailInfo = history.catatan || 'Update data non-asset';
+                    }
                 }
-            }
-
-            recentUpdates.push({
-                asset: asset.nama_asset,
-                date: new Date(lastHistory.tanggal),
-                action: actionText,
-                note: lastHistory.catatan
+                
+                // Tambahkan user info
+                const userName = history.user?.nama || 
+                                history.user?.email || 
+                                asset.updated_by?.nama || 
+                                'System';
+                
+                const userInitial = userName.charAt(0).toUpperCase();
+                
+                // Format tanggal
+                let dateDisplay = '';
+                try {
+                    const date = new Date(history.tanggal);
+                    const now = new Date();
+                    const diffTime = Math.abs(now - date);
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+                    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+                    
+                    if (diffMinutes < 1) {
+                        dateDisplay = 'Baru saja';
+                    } else if (diffMinutes < 60) {
+                        dateDisplay = `${diffMinutes} menit yang lalu`;
+                    } else if (diffHours < 24) {
+                        dateDisplay = `${diffHours} jam yang lalu`;
+                    } else if (diffDays === 1) {
+                        dateDisplay = 'Kemarin';
+                    } else if (diffDays < 7) {
+                        dateDisplay = `${diffDays} hari yang lalu`;
+                    } else {
+                        dateDisplay = date.toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    }
+                } catch (e) {
+                    dateDisplay = history.tanggal ? new Date(history.tanggal).toLocaleString() : '-';
+                }
+                
+                allActivities.push({
+                    assetId: asset.id,
+                    assetName: asset.nama_asset,
+                    assetJenis: asset.jenis_item === 'asset' ? 'Asset' : 'Non-Asset',
+                    tanggal: history.tanggal,
+                    timestamp: new Date(history.tanggal).getTime(),
+                    dateDisplay: dateDisplay,
+                    actionMessage: actionMessage,
+                    actionIcon: actionIcon,
+                    actionColor: actionColor,
+                    detailInfo: detailInfo,
+                    userName: userName,
+                    userInitial: userInitial,
+                    catatan: history.catatan || '-',
+                    isLatest: isLatest
+                });
             });
         }
     });
-
-    recentUpdates.sort((a, b) => b.date - a.date);
-
-    if (recentUpdates.length === 0) {
+    
+    // Urutkan berdasarkan tanggal (terbaru di atas)
+    allActivities.sort((a, b) => b.timestamp - a.timestamp);
+    
+    // Ambil 10 aktivitas terbaru
+    const recentActivities = allActivities.slice(0, 10);
+    
+    if (recentActivities.length === 0) {
         activityContainer.innerHTML = `
             <div class="empty-state" style="padding: 30px 20px;">
-                <i class="fas fa-history"></i>
-                <p>Belum ada aktivitas</p>
+                <i class="fas fa-history" style="font-size: 48px; color: var(--gray-light);"></i>
+                <h3 style="margin-top: 15px;">Belum ada aktivitas</h3>
+                <p style="color: var(--secondary);">Aktivitas akan muncul setelah Anda menambah atau mengupdate item</p>
             </div>
         `;
         return;
     }
-
-    const recentItems = recentUpdates.slice(0, 5);
-
-    activityContainer.innerHTML = recentItems.map(activity => {
-
-        const dateStr = activity.date.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        return `
-            <div class="asset-card" style="margin-bottom: 10px;">
-                <div class="asset-header">
-                    <div>
-                        <div class="asset-title">${activity.asset}</div>
-                        <div class="asset-subtitle">${dateStr} • ${activity.action}</div>
+    
+    // Build HTML
+    let html = '<div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">';
+    
+    recentActivities.forEach((activity, index) => {
+        // Warna border berdasarkan jenis aktivitas
+        let borderColor = activity.actionColor;
+        let badgeClass = '';
+        
+        if (activity.actionMessage.includes('Kondisi')) {
+            badgeClass = activity.actionMessage.includes('baik') ? 'badge-success' :
+                        activity.actionMessage.includes('rusak') ? 'badge-danger' : 'badge-warning';
+        } else if (activity.actionMessage.includes('Lokasi')) {
+            badgeClass = 'badge-info';
+        } else if (activity.actionMessage.includes('Baru')) {
+            badgeClass = 'badge-success';
+        } else {
+            badgeClass = 'badge-secondary';
+        }
+        
+        html += `
+            <div class="activity-item" style="
+                background: var(--card-bg);
+                border-left: 4px solid ${borderColor};
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 12px;
+                box-shadow: var(--shadow);
+                transition: transform 0.2s ease;
+                position: relative;
+                ${activity.isLatest ? 'border: 2px solid ' + borderColor + ';' : ''}
+            ">
+                <!-- HEADER ACTIVITY -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="
+                            background: ${borderColor}20;
+                            color: ${borderColor};
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 18px;
+                        ">
+                            ${activity.actionIcon}
+                        </span>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span style="font-weight: 600; color: var(--text-color);">
+                                    ${activity.assetName}
+                                </span>
+                                <span class="badge ${activity.assetJenis === 'Asset' ? 'badge-info' : 'badge-warning'}" style="font-size: 10px;">
+                                    ${activity.assetJenis}
+                                </span>
+                                ${activity.isLatest ? 
+                                    '<span class="badge badge-success" style="font-size: 10px;"><i class="fas fa-star"></i> Terbaru</span>' : 
+                                    ''}
+                            </div>
+                            <div style="font-size: 13px; color: var(--secondary); margin-top: 3px;">
+                                ${activity.actionMessage}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 12px; color: var(--secondary); background: var(--light); padding: 4px 8px; border-radius: 12px;">
+                            <i class="far fa-clock"></i> ${activity.dateDisplay}
+                        </div>
                     </div>
                 </div>
-                <div style="color: var(--secondary); font-size: 14px;">
-                    ${activity.note || 'Tidak ada catatan'}
+                
+                <!-- DETAIL INFO -->
+                <div style="margin: 10px 0 8px 42px; padding: 8px 12px; background: var(--light); border-radius: 6px; font-size: 13px; color: var(--text-color);">
+                    <i class="fas fa-info-circle" style="color: ${borderColor}; margin-right: 5px;"></i>
+                    ${activity.detailInfo}
+                </div>
+                
+                <!-- FOOTER: USER & CATATAN -->
+                <div style="margin-left: 42px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50%;
+                            background: ${borderColor};
+                            color: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                            font-weight: bold;
+                        ">
+                            ${activity.userInitial}
+                        </div>
+                        <span style="font-size: 12px; color: var(--secondary);">
+                            ${activity.userName}
+                        </span>
+                    </div>
+                    
+                    ${activity.catatan && activity.catatan !== '-' ? `
+                        <div style="font-size: 12px; color: var(--secondary); max-width: 60%;" title="${activity.catatan}">
+                            <i class="fas fa-quote-right" style="opacity: 0.5;"></i> 
+                            ${activity.catatan.length > 40 ? activity.catatan.substring(0, 40) + '...' : activity.catatan}
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <!-- TOMBOL LIHAT DETAIL (jika ingin langsung ke asset) -->
+                <div style="margin-top: 12px; margin-left: 42px; display: flex; gap: 8px;">
+                    <button class="btn btn-outline btn-small" onclick="showAssetDetail('${activity.assetId}')" style="font-size: 11px; padding: 4px 10px;">
+                        <i class="fas fa-eye"></i> Lihat Detail Item
+                    </button>
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    
+    // Tambah tombol Lihat Semua jika ada lebih dari 10
+    if (allActivities.length > 10) {
+        html += `
+            <div style="text-align: center; margin-top: 15px; padding: 10px; background: var(--light); border-radius: 8px;">
+                <span style="font-size: 13px; color: var(--secondary);">
+                    <i class="fas fa-list"></i> Total ${allActivities.length} aktivitas
+                </span>
+                <button class="btn btn-outline btn-small" onclick="showAllActivities()" style="margin-left: 10px;">
+                    Lihat Semua
+                </button>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    activityContainer.innerHTML = html;
 }
 
+// ==============================================
+// FUNGSI UNTUK MELIHAT SEMUA AKTIVITAS (OPSIONAL)
+// ==============================================
+function showAllActivities() {
+    // Kumpulkan semua aktivitas
+    const allActivities = [];
+    
+    assets.forEach(asset => {
+        if (asset.riwayat && Array.isArray(asset.riwayat)) {
+            asset.riwayat.forEach(history => {
+                allActivities.push({
+                    asset: asset,
+                    history: history,
+                    tanggal: history.tanggal
+                });
+            });
+        }
+    });
+    
+    // Urutkan
+    allActivities.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    
+    // Buat modal untuk menampilkan semua aktivitas
+    const modalHTML = `
+        <div class="modal active" id="allActivitiesModal">
+            <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fas fa-history"></i> Semua Aktivitas (${allActivities.length})
+                    </div>
+                    <span class="close-modal" onclick="document.getElementById('allActivitiesModal').remove()">&times;</span>
+                </div>
+                <div style="padding: 20px;" id="allActivitiesContent">
+                    <!-- Akan diisi dengan JS -->
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Render activities di modal
+    const content = document.getElementById('allActivitiesContent');
+    let html = '';
+    
+    allActivities.forEach((item, index) => {
+        const asset = item.asset;
+        const history = item.history;
+        const date = new Date(history.tanggal).toLocaleString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        html += `
+            <div class="asset-card" style="margin-bottom: 10px;">
+                <div class="asset-header">
+                    <div>
+                        <div class="asset-title">${asset.nama_asset}</div>
+                        <div class="asset-subtitle">
+                            ${date} | ${history.user?.nama || 'System'}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 10px; background: var(--light); border-radius: 5px;">
+                    <pre style="white-space: pre-wrap; font-family: inherit;">${JSON.stringify(history, null, 2)}</pre>
+                </div>
+            </div>
+        `;
+    });
+    
+    content.innerHTML = html;
+}
         
         // ==============================================
         // UI FUNCTIONS
@@ -7056,7 +7590,9 @@ function getPhotoCountFromCache(assetId) {
     return photoCountMap.get(assetId) || 0;
 }
 
-// Update displayAssets dengan filter foto
+// ==============================================
+// DISPLAY ASSETS DENGAN THUMBNAIL FOTO
+// ==============================================
 async function displayAssets(filteredAssets = assets) {
     const assetsList = document.getElementById('assetsList');
     const filterJenis = document.getElementById('filterJenis').value;
@@ -7131,11 +7667,24 @@ async function displayAssets(filteredAssets = assets) {
         return;
     }
     
+    // Ambil foto untuk semua asset yang difilter (batch)
+    const allPhotos = await getAllPhotos();
+    const photoMap = new Map();
+    
+    // Group photos by assetId
+    allPhotos.forEach(photo => {
+        if (!photoMap.has(photo.assetId)) {
+            photoMap.set(photo.assetId, []);
+        }
+        photoMap.get(photo.assetId).push(photo);
+    });
+    
     let html = '';
     
-    filteredAssets.forEach(asset => {
+    for (const asset of filteredAssets) {
         const effectiveCondition = getEffectiveCondition(asset);
-        const photoCount = getPhotoCountFromCache(asset.id);
+        const assetPhotos = photoMap.get(asset.id) || [];
+        const photoCount = assetPhotos.length;
         
         const badgeClass =
             effectiveCondition === 'baik' ? 'badge-success' :
@@ -7157,30 +7706,88 @@ async function displayAssets(filteredAssets = assets) {
             '<span class="sync-badge"><i class="fas fa-clock"></i> Pending</span>' : 
             '<span class="sync-badge" style="background-color: rgba(16, 185, 129, 0.15); color: var(--success);"><i class="fas fa-check"></i> Synced</span>';
         
-        // TAMBAHKAN INDIKATOR FOTO
-        const photoIndicator = photoCount > 0 ? 
-            `<span class="badge badge-info" style="margin-left: 5px;" title="${photoCount} foto"><i class="fas fa-camera"></i> ${photoCount}</span>` :
-            `<span class="badge badge-secondary" style="margin-left: 5px; opacity: 0.5;" title="Tidak ada foto"><i class="fas fa-camera"></i> 0</span>`;
+        // ============ BUAT THUMBNAIL FOTO ============
+        let thumbnailsHtml = '<div class="asset-thumbnail-container">';
         
+        if (photoCount > 0) {
+            // Tampilkan maksimal 3 foto thumbnail
+            const maxThumbs = Math.min(photoCount, 3);
+            
+            for (let i = 0; i < maxThumbs; i++) {
+                const photo = assetPhotos[i];
+                
+                // Tentukan sumber gambar yang aman
+                let imgSrc = photo.displayUrl || 
+                            photo.image || 
+                            photo.thumbnail || 
+                            (photo.cloudinary?.secure_url && navigator.onLine ? photo.cloudinary.secure_url : null);
+                
+                if (imgSrc) {
+                    thumbnailsHtml += `
+                        <div class="asset-thumb-badge" style="position: relative;">
+                            <img src="${imgSrc}" 
+                                 class="asset-thumb" 
+                                 data-asset-id="${asset.id}"
+                                 data-photo-index="${i}"
+                                 onclick="showPhotoFromThumb('${asset.id}', ${i})"
+                                 title="${photo.type === 'utama' ? 'Foto Utama' : 'Foto ' + photo.type}"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23f0f0f0\'/%3E%3Ctext x=\'30\' y=\'35\' font-size=\'12\' text-anchor=\'middle\' fill=\'%23999\'%3E📸%3C/text%3E%3C/svg%3E';">
+                            ${photo.type === 'utama' ? '<span class="badge badge-info" style="position: absolute; top: -5px; right: -5px; font-size: 8px; padding: 2px 4px;">★</span>' : ''}
+                        </div>
+                    `;
+                } else {
+                    // Fallback jika gambar tidak tersedia
+                    thumbnailsHtml += `
+                        <div class="asset-thumb-placeholder" onclick="showAssetDetail('${asset.id}')">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Jika lebih dari 3 foto, tampilkan indikator "+X"
+            if (photoCount > 3) {
+                thumbnailsHtml += `
+                    <div class="asset-thumb-more" onclick="showAssetDetail('${asset.id}')" title="${photoCount - 3} foto lainnya">
+                        +${photoCount - 3}
+                    </div>
+                `;
+            }
+        } else {
+            // Tidak ada foto
+            thumbnailsHtml += `
+                <div class="asset-thumb-placeholder" onclick="showAssetDetail('${asset.id}')" title="Tidak ada foto">
+                    <i class="fas fa-camera"></i>
+                </div>
+            `;
+        }
+        
+        thumbnailsHtml += '</div>';
+        
+        // ============ CARD UTAMA ============
         html += `
             <div class="asset-card" data-asset-id="${asset.id}">
                 <div class="asset-header">
                     <div style="flex: 1;">
                         <div class="asset-title">
-                            ${jenisBadge} ${asset.nama_asset} ${syncBadge} ${photoIndicator}
+                            ${jenisBadge} ${asset.nama_asset} ${syncBadge}
                         </div>
                         <div class="asset-subtitle">
-                            Kode: ${asset.material_kode} | 
-                            RS: ${asset.no_rs || '-'} | 
-                            PO: ${asset.no_po || '-'} | 
-                            No Asset: ${asset.jenis_item === 'asset' ? (asset.no_asset || '-') : '-'} |
-                            Lokasi: ${asset.lokasi}
+                            <i class="fas fa-barcode"></i> ${asset.material_kode} | 
+                            <i class="fas fa-file-alt"></i> RS: ${asset.no_rs || '-'} | 
+                            <i class="fas fa-map-pin"></i> ${asset.lokasi}
+                            ${asset.jenis_item === 'asset' ? ` | <i class="fas fa-tag"></i> No Asset: ${asset.no_asset || '-'}` : ''}
                         </div>
                     </div>
                     <div>
                         <div class="badge ${badgeClass}">${badgeText}</div>
+                        <div style="margin-top: 5px; text-align: right;">
+                            <small><i class="fas fa-camera"></i> ${photoCount} foto</small>
+                        </div>
                     </div>
                 </div>
+                
+                ${thumbnailsHtml}
                 
                 <div class="form-row" style="margin-top: 15px;">
                     <div class="form-col">
@@ -7191,13 +7798,13 @@ async function displayAssets(filteredAssets = assets) {
                             <i class="fas fa-edit"></i> Update
                         </button>
                         <button class="btn btn-outline btn-small view-photos" data-asset-id="${asset.id}">
-                            <i class="fas fa-images"></i> Foto (${photoCount})
+                            <i class="fas fa-images"></i> Galeri
                         </button>
                     </div>
                 </div>
             </div>
         `;
-    });
+    }
     
     assetsList.innerHTML = html;
     
@@ -7232,29 +7839,49 @@ async function displayAssets(filteredAssets = assets) {
     });
 }
 
-// Update event listener untuk filter
-function setupFilterListeners() {
-    document.getElementById('searchAsset').addEventListener('input', function() {
-        displayAssets();
-    });
+// ==============================================
+// FUNGSI UNTUK MENAMPILKAN FOTO DARI THUMBNAIL
+// ==============================================
+async function showPhotoFromThumb(assetId, photoIndex) {
+    const photos = await getAssetPhotos(assetId);
+    if (!photos || photos.length === 0 || photoIndex >= photos.length) return;
     
-    document.getElementById('filterJenis').addEventListener('change', function() {
-        displayAssets();
-    });
+    const photo = photos[photoIndex];
     
-    document.getElementById('filterKondisi').addEventListener('change', function() {
-        displayAssets();
-    });
+    // Tentukan sumber gambar
+    let imgSrc = photo.displayUrl || photo.image || photo.thumbnail;
     
-    document.getElementById('filterLokasi').addEventListener('change', function() {
-        displayAssets();
-    });
+    // Jika online dan ada cloudinary, pakai yang HD
+    if (navigator.onLine && photo.cloudinary?.secure_url) {
+        imgSrc = photo.cloudinary.secure_url;
+    }
     
-    // TAMBAHKAN INI - Filter Foto
-    document.getElementById('filterFoto').addEventListener('change', function() {
-        displayAssets();
-    });
+    // Fallback
+    if (!imgSrc) {
+        showToastNotification('Foto tidak tersedia', 'warning');
+        return;
+    }
+    
+    // Tampilkan di modal foto
+    document.getElementById('largePhoto').src = imgSrc;
+    
+    const photoInfo = document.getElementById('photoInfo');
+    if (photoInfo) {
+        const date = photo.tanggal ? new Date(photo.tanggal).toLocaleDateString('id-ID') : 'Tidak diketahui';
+        const type = photo.type === 'utama' ? 'Foto Utama' : `Foto ${photo.type}`;
+        const source = photo.cloudinary ? 'Cloudinary' : 'Lokal';
+        
+        photoInfo.innerHTML = `
+            <p><strong>${type}</strong></p>
+            <p><i class="fas fa-calendar"></i> ${date}</p>
+            <p><i class="fas fa-cloud"></i> Sumber: ${source}</p>
+            ${photo.cloudinary ? '<small class="badge badge-info">HD Tersedia</small>' : ''}
+        `;
+    }
+    
+    document.getElementById('photoModal').classList.add('active');
 }
+
 
 
 // ==============================================
@@ -7695,10 +8322,6 @@ setTimeout(() => {
         console.error("Error setting up photo listeners:", listenerError);
     }
 }, 100);
-
-// =============================================
-// SAFE EVENT LISTENERS UNTUK TOMBOL PRINT & SHARE
-// =============================================
 
 setTimeout(() => {
     try {
@@ -8391,7 +9014,10 @@ async function updateAssetCondition(
     
     document.getElementById('assetInfo').style.display = 'block';
 }
-        async function loadGallery(assetId = '') {
+        // ==============================================
+// LOAD GALLERY DENGAN KETERANGAN KONDISI FOTO
+// ==============================================
+async function loadGallery(assetId = '') {
     try {
         const galleryContainer = document.getElementById('galleryContainer');
         let allPhotos = [];
@@ -8418,6 +9044,80 @@ async function updateAssetCondition(
             }
         }
         
+        // ============ AMBIL DATA ASSET UNTUK INFO KONDISI ============
+        const assetMap = {};
+        assets.forEach(asset => {
+            assetMap[asset.id] = {
+                nama: asset.nama_asset,
+                kondisi_saat_foto: null // Akan diisi dari riwayat nanti
+            };
+        });
+        
+        // Mapping kondisi foto berdasarkan timestamp
+        // Kita perlu mencari kondisi asset pada saat foto diambil
+        const photoConditionMap = new Map();
+        
+        for (const photo of filteredPhotos) {
+            const asset = assets.find(a => a.id === photo.assetId);
+            if (!asset) continue;
+            
+            let kondisiSaatFoto = 'tidak diketahui';
+            let timestampFoto = photo.timestamp || new Date(photo.tanggal).getTime();
+            
+            // Cari di riwayat untuk mengetahui kondisi saat foto diambil
+            if (asset.riwayat && Array.isArray(asset.riwayat)) {
+                // Urutkan riwayat berdasarkan tanggal
+                const sortedRiwayat = [...asset.riwayat].sort((a, b) => 
+                    new Date(a.tanggal) - new Date(b.tanggal)
+                );
+                
+                // Cari riwayat terdekat sebelum foto diambil
+                let kondisiTerdekat = null;
+                for (const riwayat of sortedRiwayat) {
+                    const riwayatTime = new Date(riwayat.tanggal).getTime();
+                    if (riwayatTime <= timestampFoto) {
+                        if (asset.jenis_item === 'asset') {
+                            kondisiTerdekat = riwayat.new_kondisi;
+                        } else if (asset.jenis_item === 'non-asset') {
+                            // Untuk non-asset, kita perlu dominant condition
+                            const detail = riwayat.new_jumlah || riwayat.new_kondisi_detail;
+                            if (detail) {
+                                const baik = detail.baik || 0;
+                                const rusak = detail.rusak || 0;
+                                const mutasi = detail.Mutasi || 0;
+                                
+                                if (baik > rusak && baik > mutasi) kondisiTerdekat = 'baik';
+                                else if (rusak > baik && rusak > mutasi) kondisiTerdekat = 'rusak';
+                                else if (mutasi > baik && mutasi > rusak) kondisiTerdekat = 'Mutasi';
+                                else kondisiTerdekat = 'distribusi';
+                            }
+                        }
+                    }
+                }
+                
+                // Jika tidak ditemukan di riwayat, cek langsung dari asset
+                if (!kondisiTerdekat) {
+                    if (asset.jenis_item === 'asset') {
+                        kondisiTerdekat = asset.kondisi;
+                    } else {
+                        const detail = asset.kondisi_detail;
+                        if (detail) {
+                            const baik = detail.baik || 0;
+                            const rusak = detail.rusak || 0;
+                            const mutasi = detail.Mutasi || 0;
+                            
+                            if (baik > rusak && baik > mutasi) kondisiTerdekat = 'baik';
+                            else if (rusak > baik && rusak > mutasi) kondisiTerdekat = 'rusak';
+                            else if (mutasi > baik && mutasi > rusak) kondisiTerdekat = 'Mutasi';
+                            else kondisiTerdekat = 'distribusi';
+                        }
+                    }
+                }
+                
+                photoConditionMap.set(photo.id || `${photo.assetId}_${photo.timestamp}`, kondisiTerdekat);
+            }
+        }
+        
         if (!filteredPhotos || filteredPhotos.length === 0) {
             galleryContainer.innerHTML = `
                 <div class="empty-state">
@@ -8429,9 +9129,11 @@ async function updateAssetCondition(
             return;
         }
         
-        const assetMap = {};
-        assets.forEach(asset => {
-            assetMap[asset.id] = asset.nama_asset;
+        // Sort photos by date (newest first)
+        filteredPhotos.sort((a, b) => {
+            const timeA = a.timestamp || new Date(a.tanggal).getTime();
+            const timeB = b.timestamp || new Date(b.tanggal).getTime();
+            return timeB - timeA;
         });
         
         let html = '<div class="gallery-grid">';
@@ -8455,8 +9157,79 @@ async function updateAssetCondition(
                 source = 'unavailable';
             }
             
-            const typeText = photo.type === 'utama' ? 'Utama' : photo.type === 'rusak' ? 'Rusak' : 'Perbaikan';
-            const typeClass = photo.type === 'utama' ? 'badge-info' : photo.type === 'rusak' ? 'badge-danger' : 'badge-warning';
+            // ============ TENTUKAN KONDISI FOTO ============
+            const photoKey = photo.id || `${photo.assetId}_${photo.timestamp}`;
+            let kondisiFoto = photoConditionMap.get(photoKey) || 'tidak diketahui';
+            
+            // Fallback: cek dari type foto
+            if (kondisiFoto === 'tidak diketahui') {
+                if (photo.type === 'rusak') kondisiFoto = 'rusak';
+                else if (photo.type === 'Mutasi') kondisiFoto = 'Mutasi';
+                else if (photo.type === 'baik') kondisiFoto = 'baik';
+                else if (photo.type === 'utama') {
+                    // Coba cek dari asset
+                    const asset = assets.find(a => a.id === photo.assetId);
+                    if (asset) {
+                        if (asset.jenis_item === 'asset') {
+                            kondisiFoto = asset.kondisi || 'tidak diketahui';
+                        } else {
+                            const detail = asset.kondisi_detail;
+                            if (detail) {
+                                const baik = detail.baik || 0;
+                                const rusak = detail.rusak || 0;
+                                const mutasi = detail.Mutasi || 0;
+                                
+                                if (baik > rusak && baik > mutasi) kondisiFoto = 'baik';
+                                else if (rusak > baik && rusak > mutasi) kondisiFoto = 'rusak';
+                                else if (mutasi > baik && mutasi > rusak) kondisiFoto = 'Mutasi';
+                                else kondisiFoto = 'distribusi';
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // ============ TENTUKAN BADGE KONDISI ============
+            let kondisiBadge = '';
+            let kondisiClass = '';
+            let kondisiIcon = '';
+            
+            switch(kondisiFoto) {
+                case 'baik':
+                    kondisiBadge = '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Baik</span>';
+                    kondisiClass = 'gallery-condition-baik';
+                    kondisiIcon = '✅';
+                    break;
+                case 'rusak':
+                    kondisiBadge = '<span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Rusak</span>';
+                    kondisiClass = 'gallery-condition-rusak';
+                    kondisiIcon = '⚠️';
+                    break;
+                case 'Mutasi':
+                    kondisiBadge = '<span class="badge badge-warning"><i class="fas fa-exchange-alt"></i> Mutasi</span>';
+                    kondisiClass = 'gallery-condition-mutasi';
+                    kondisiIcon = '🔄';
+                    break;
+                case 'distribusi':
+                    kondisiBadge = '<span class="badge badge-info"><i class="fas fa-chart-pie"></i> Distribusi</span>';
+                    kondisiClass = 'gallery-condition-distribusi';
+                    kondisiIcon = '📊';
+                    break;
+                default:
+                    kondisiBadge = '<span class="badge badge-secondary"><i class="fas fa-question"></i> Tidak Diketahui</span>';
+                    kondisiClass = 'gallery-condition-unknown';
+                    kondisiIcon = '❓';
+            }
+            
+            const typeText = photo.type === 'utama' ? 'Utama' : 
+                            photo.type === 'rusak' ? 'Rusak' : 
+                            photo.type === 'Mutasi' ? 'Mutasi' : 
+                            photo.type === 'baik' ? 'Baik' : 'Perbaikan';
+            
+            const typeClass = photo.type === 'utama' ? 'badge-info' : 
+                             photo.type === 'rusak' ? 'badge-danger' : 
+                             photo.type === 'Mutasi' ? 'badge-warning' : 
+                             photo.type === 'baik' ? 'badge-success' : 'badge-secondary';
             
             const sourceBadge = source === 'cloudinary' ? 
                 '<span class="cloudinary-badge"><i class="fas fa-cloud"></i> Cloudinary</span>' : 
@@ -8466,27 +9239,75 @@ async function updateAssetCondition(
                 '<span class="sync-badge"><i class="fas fa-database"></i> Lokal</span>' :
                 '<span class="badge badge-secondary">Tidak Tersedia</span>';
             
-            const date = photo.tanggal ? new Date(photo.tanggal).toLocaleDateString('id-ID') : '-';
+            const date = photo.tanggal ? new Date(photo.tanggal).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '-';
+            
+            const assetInfo = assetMap[photo.assetId]?.nama || photo.assetId;
             
             html += `
-                <div class="gallery-item" data-photo-index="${index}">
-                    <img src="${imgSrc}" 
-                         alt="Foto Item" 
-                         class="gallery-image safe-gallery-image" 
-                         data-photo-id="${photo.id || ''}"
-                         data-has-cloudinary="${!!photo.cloudinary}"
-                         data-has-local="${!!photo.image}"
-                         data-local-src="${photo.image || photo.thumbnail || ''}"
-                         data-cloudinary-src="${photo.cloudinary?.secure_url || ''}"
-                         loading="lazy"
-                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'150\' viewBox=\'0 0 200 150\'%3E%3Crect width=\'200\' height=\'150\' fill=\'%23f0f0f0\'/%3E%3Ctext x=\'100\' y=\'75\' font-size=\'14\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\'%3ELoad Error%3C/text%3E%3C/svg%3E'">
-                    <div class="gallery-info">
-                        <div class="gallery-asset">${assetMap[photo.assetId] || photo.assetId}</div>
-                        <div>
-                            <span class="badge ${typeClass}">${typeText}</span> 
-                            ${sourceBadge}
+                <div class="gallery-item gallery-item-${kondisiClass}" data-photo-index="${index}" data-kondisi="${kondisiFoto}">
+                    <div style="position: relative;">
+                        <img src="${imgSrc}" 
+                             alt="Foto ${assetInfo}" 
+                             class="gallery-image safe-gallery-image" 
+                             data-photo-id="${photo.id || ''}"
+                             data-asset-id="${photo.assetId}"
+                             data-kondisi="${kondisiFoto}"
+                             data-type="${photo.type}"
+                             data-tanggal="${photo.tanggal}"
+                             data-has-cloudinary="${!!photo.cloudinary}"
+                             data-has-local="${!!photo.image}"
+                             data-local-src="${photo.image || photo.thumbnail || ''}"
+                             data-cloudinary-src="${photo.cloudinary?.secure_url || ''}"
+                             loading="lazy"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'150\' viewBox=\'0 0 200 150\'%3E%3Crect width=\'200\' height=\'150\' fill=\'%23f0f0f0\'/%3E%3Ctext x=\'100\' y=\'75\' font-size=\'14\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\'%3E${kondisiIcon} ${kondisiFoto}%3C/text%3E%3C/svg%3E'">
+                        
+                        <!-- BADGE KONDISI DI ATAS FOTO -->
+                        <div style="position: absolute; top: 10px; left: 10px; z-index: 10;">
+                            ${kondisiBadge}
                         </div>
-                        <div class="gallery-date">${date}</div>
+                        
+                        <!-- BADGE TIPE FOTO -->
+                        <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                            <span class="badge ${typeClass}">${typeText}</span>
+                        </div>
+                        
+                        <!-- INDIKATOR SUMBER (jika thumbnail) -->
+                        ${source === 'thumbnail' ? `
+                            <div style="position: absolute; bottom: 10px; left: 10px; z-index: 10;">
+                                <span class="badge badge-info" style="font-size: 10px;"><i class="fas fa-compress"></i> Thumb</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="gallery-info">
+                        <div class="gallery-asset" title="${assetInfo}">
+                            <i class="fas fa-cube"></i> ${assetInfo.length > 30 ? assetInfo.substring(0, 30) + '...' : assetInfo}
+                        </div>
+                        
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0;">
+                            ${sourceBadge}
+                            ${photo.cloudinary ? '<span class="cloudinary-badge"><i class="fas fa-cloud-upload-alt"></i> HD</span>' : ''}
+                        </div>
+                        
+                        <div class="gallery-date">
+                            <i class="fas fa-calendar-alt"></i> ${date}
+                        </div>
+                        
+                        <!-- TOMBOL LIHAT DETAIL -->
+                        <div style="margin-top: 10px; display: flex; gap: 5px;">
+                            <button class="btn btn-outline btn-small" style="flex:1; padding: 4px;" onclick="showAssetDetail('${photo.assetId}')">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                            <button class="btn btn-outline btn-small" style="flex:1; padding: 4px;" onclick="downloadPhoto('${photo.assetId}', ${index})">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -8495,7 +9316,26 @@ async function updateAssetCondition(
         html += '</div>';
         galleryContainer.innerHTML = html;
         
-        // Event listener dengan error handling
+        // ============ TAMBAHKAN CSS DINAMIS ============
+        const style = document.createElement('style');
+        style.textContent = `
+            .gallery-condition-baik { border-top: 4px solid #10b981; }
+            .gallery-condition-rusak { border-top: 4px solid #ef4444; }
+            .gallery-condition-mutasi { border-top: 4px solid #f59e0b; }
+            .gallery-condition-distribusi { border-top: 4px solid #3b82f6; }
+            .gallery-condition-unknown { border-top: 4px solid #9ca3af; }
+            
+            .gallery-item {
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .gallery-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // ============ EVENT LISTENER UNTUK FOTO ============
         document.querySelectorAll('.safe-gallery-image').forEach(img => {
             img.addEventListener('click', function(e) {
                 try {
@@ -8521,12 +9361,37 @@ async function updateAssetCondition(
                     
                     let infoHtml = '';
                     if (photo) {
-                        const fullDate = photo.tanggal ? new Date(photo.tanggal).toLocaleString('id-ID') : 'Tidak diketahui';
+                        const fullDate = photo.tanggal ? new Date(photo.tanggal).toLocaleString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) : 'Tidak diketahui';
+                        
+                        const kondisi = this.dataset.kondisi || 'tidak diketahui';
+                        const kondisiText = kondisi === 'baik' ? 'Baik' : 
+                                           kondisi === 'rusak' ? 'Rusak' : 
+                                           kondisi === 'Mutasi' ? 'Mutasi' : 
+                                           kondisi === 'distribusi' ? 'Distribusi' : 'Tidak Diketahui';
+                        
                         infoHtml = `
-                            <p><strong>Item:</strong> ${assetMap[photo.assetId] || photo.assetId}</p>
-                            <p><strong>Tipe:</strong> ${photo.type === 'utama' ? 'Foto Utama' : photo.type}</p>
-                            <p><strong>Tanggal:</strong> ${fullDate}</p>
-                            ${!navigator.onLine && photo.cloudinary ? '<p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Foto HD tersedia saat online</p>' : ''}
+                            <div style="text-align: left; padding: 10px;">
+                                <p><strong><i class="fas fa-cube"></i> Item:</strong> ${assetMap[photo.assetId]?.nama || photo.assetId}</p>
+                                <p><strong><i class="fas fa-tag"></i> Tipe Foto:</strong> ${photo.type === 'utama' ? 'Foto Utama' : photo.type}</p>
+                                <p><strong><i class="fas fa-clipboard-check"></i> Kondisi Saat Foto:</strong> 
+                                    <span class="badge ${
+                                        kondisi === 'baik' ? 'badge-success' :
+                                        kondisi === 'rusak' ? 'badge-danger' :
+                                        kondisi === 'Mutasi' ? 'badge-warning' :
+                                        kondisi === 'distribusi' ? 'badge-info' : 'badge-secondary'
+                                    }">${kondisiText}</span>
+                                </p>
+                                <p><strong><i class="fas fa-calendar"></i> Tanggal:</strong> ${fullDate}</p>
+                                <p><strong><i class="fas fa-cloud"></i> Sumber:</strong> ${photo.cloudinary ? 'Cloudinary (HD)' : 'Lokal'}</p>
+                                ${!navigator.onLine && photo.cloudinary ? '<p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Foto HD tersedia saat online</p>' : ''}
+                            </div>
                         `;
                     }
                     
@@ -8552,6 +9417,53 @@ async function updateAssetCondition(
                 </button>
             </div>
         `;
+    }
+}
+
+// ==============================================
+// FUNGSI DOWNLOAD FOTO (OPSIONAL)
+// ==============================================
+async function downloadPhoto(assetId, photoIndex) {
+    const photos = await getAssetPhotos(assetId);
+    if (!photos || photos.length === 0 || photoIndex >= photos.length) return;
+    
+    const photo = photos[photoIndex];
+    
+    // Tentukan sumber gambar terbaik
+    let imgSrc = null;
+    let filename = `foto_${assetId}_${Date.now()}.jpg`;
+    
+    if (navigator.onLine && photo.cloudinary?.secure_url) {
+        imgSrc = photo.cloudinary.secure_url;
+    } else if (photo.image) {
+        imgSrc = photo.image;
+    } else if (photo.thumbnail) {
+        imgSrc = photo.thumbnail;
+        filename = `thumbnail_${assetId}_${Date.now()}.jpg`;
+    }
+    
+    if (!imgSrc) {
+        showToastNotification('Tidak ada sumber foto untuk didownload', 'warning');
+        return;
+    }
+    
+    try {
+        // Download dengan fetch
+        const response = await fetch(imgSrc);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showToastNotification('✅ Foto didownload', 'success');
+    } catch (error) {
+        console.error("Download error:", error);
+        showToastNotification('❌ Gagal download foto', 'danger');
     }
 }
         
@@ -11491,43 +12403,35 @@ document.getElementById('updateConditionForm')
             });
             
             // Search and filter
-            document.getElementById('searchAsset').addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const filterJenis = document.getElementById('filterJenis').value;
-                const filterKondisi = document.getElementById('filterKondisi').value;
-                const filterLokasi = document.getElementById('filterLokasi').value;
-                
-                const filteredAssets = assets.filter(asset => {
-                    const matchesSearch = !searchTerm || 
-                        asset.nama_asset.toLowerCase().includes(searchTerm) ||
-                        asset.material_kode.toLowerCase().includes(searchTerm) ||
-                        (asset.no_rs && asset.no_rs.toLowerCase().includes(searchTerm)) ||
-                        (asset.no_po && asset.no_po.toLowerCase().includes(searchTerm)) ||
-                        asset.lokasi.toLowerCase().includes(searchTerm);
-                    
-                    const matchesJenis = !filterJenis || asset.jenis_item === filterJenis;
-                    const matchesKondisi =
-    !filterKondisi ||
-    getEffectiveCondition(asset) === filterKondisi;
-                    const matchesLokasi = !filterLokasi || asset.lokasi === filterLokasi;
-                    
-                    return matchesSearch && matchesJenis && matchesKondisi && matchesLokasi;
-                });
-                
-                displayAssets(filteredAssets);
-            });
-            
-            document.getElementById('filterJenis').addEventListener('change', function() {
-                document.getElementById('searchAsset').dispatchEvent(new Event('input'));
-            });
-            
-            document.getElementById('filterKondisi').addEventListener('change', function() {
-                document.getElementById('searchAsset').dispatchEvent(new Event('input'));
-            });
-            
-            document.getElementById('filterLokasi').addEventListener('change', function() {
-                document.getElementById('searchAsset').dispatchEvent(new Event('input'));
-            });
+            // ==============================================
+// FILTER & SEARCH - VERSI SEDERHANA
+// ==============================================
+
+// Search input
+document.getElementById('searchAsset').addEventListener('input', function() {
+    displayAssets();
+});
+
+// Filter Jenis
+document.getElementById('filterJenis').addEventListener('change', function() {
+    displayAssets();
+});
+
+// Filter Kondisi
+document.getElementById('filterKondisi').addEventListener('change', function() {
+    displayAssets();
+});
+
+// Filter Lokasi
+document.getElementById('filterLokasi').addEventListener('change', function() {
+    displayAssets();
+});
+
+// ============ FILTER FOTO (YANG BARU) ============
+document.getElementById('filterFoto').addEventListener('change', function() {
+    console.log("📸 Filter foto berubah ke:", this.value);
+    displayAssets();
+});
             
             // Sync buttons
             document.getElementById('btnSyncNow').addEventListener('click', runSyncNow);
@@ -11864,158 +12768,200 @@ if (navigator.onLine) {
         }
         
         async function clearLocalData() {
-            return new Promise((resolve) => {
-                const modalHTML = `
-                    <div class="modal active" id="clearLocalModal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div class="modal-title">Hapus Data Lokal</div>
-                                <div class="close-modal" id="closeClearLocalModal">&times;</div>
-                            </div>
-                            <div id="clearLocalModalContent" style="padding: 20px;">
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <strong>PERINGATAN!</strong> Tindakan ini akan menghapus:
-                                    <ul style="margin-left: 20px; margin-top: 10px;">
-                                        <li>Semua data item dari IndexedDB</li>
-                                        <li>Semua foto dari database lokal</li>
-                                        <li>Semua riwayat backup</li>
-                                        <li>Semua pengaturan lokal</li>
-                                    </ul>
-                                    <p style="margin-top: 10px;">Data di Firebase dan Cloudinary TIDAK akan terpengaruh.</p>
-                                    <p><strong>Tindakan ini tidak dapat dibatalkan!</strong></p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="clearLocalPassword">Masukkan sandi konfirmasi:</label>
-                                    <input type="password" id="clearLocalPassword" placeholder="115ganteng" class="form-control" style="width: 100%; padding: 10px; margin: 10px 0;">
-                                </div>
-                                <div id="clearLocalError" style="color: var(--danger); display: none; margin-bottom: 10px;">
-                                    <i class="fas fa-exclamation-circle"></i> Sandi salah!
-                                </div>
-                                <div class="form-group" style="display: flex; gap: 10px;">
-                                    <button class="btn btn-danger" id="confirmClearLocal">
-                                        <i class="fas fa-trash"></i> HAPUS DATA LOKAL
-                                    </button>
-                                    <button class="btn btn-outline" id="cancelClearLocal">
-                                        <i class="fas fa-times"></i> Batal
-                                    </button>
-                                </div>
-                            </div>
+    return new Promise((resolve) => {
+        const modalHTML = `
+            <div class="modal active" id="clearLocalModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title">Hapus Data Lokal</div>
+                        <div class="close-modal" id="closeClearLocalModal">&times;</div>
+                    </div>
+                    <div id="clearLocalModalContent" style="padding: 20px;">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>PERINGATAN!</strong> Tindakan ini akan menghapus:
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Semua data item dari IndexedDB</li>
+                                <li>Semua foto dari database lokal</li>
+                                <li>Semua riwayat backup</li>
+                                <li>Semua pengaturan lokal</li>
+                            </ul>
+                            <p style="margin-top: 10px;">Data di Firebase dan Cloudinary TIDAK akan terpengaruh.</p>
+                            <p><strong>⚠️ SETELAH INI, APLIKASI AKAN REFRESH OTOMATIS UNTUK MENGAMBIL DATA DARI CLOUD</strong></p>
+                            <p><strong>Tindakan ini tidak dapat dibatalkan!</strong></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="clearLocalPassword">Masukkan sandi konfirmasi:</label>
+                            <input type="password" id="clearLocalPassword" placeholder="115ganteng" class="form-control" style="width: 100%; padding: 10px; margin: 10px 0;">
+                        </div>
+                        <div id="clearLocalError" style="color: var(--danger); display: none; margin-bottom: 10px;">
+                            <i class="fas fa-exclamation-circle"></i> Sandi salah!
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 10px;">
+                            <button class="btn btn-danger" id="confirmClearLocal">
+                                <i class="fas fa-trash"></i> HAPUS DATA LOKAL
+                            </button>
+                            <button class="btn btn-outline" id="cancelClearLocal">
+                                <i class="fas fa-times"></i> Batal
+                            </button>
                         </div>
                     </div>
-                `;
-                
-                const modalContainer = document.createElement('div');
-                modalContainer.innerHTML = modalHTML;
-                document.body.appendChild(modalContainer);
-                
-                const closeModal = () => {
+                </div>
+            </div>
+        `;
+        
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHTML;
+        document.body.appendChild(modalContainer);
+        
+        const closeModal = () => {
+            const modal = document.getElementById('clearLocalModal');
+            if (modal) {
+                modal.remove();
+            }
+            resolve(false);
+        };
+        
+        setTimeout(() => {
+            const closeBtn = document.getElementById('closeClearLocalModal');
+            const cancelBtn = document.getElementById('cancelClearLocal');
+            const confirmBtn = document.getElementById('confirmClearLocal');
+            const passwordInput = document.getElementById('clearLocalPassword');
+            const errorMsg = document.getElementById('clearLocalError');
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModal);
+            }
+            
+            if (confirmBtn && passwordInput) {
+                confirmBtn.addEventListener('click', async () => {
+                    const password = passwordInput.value.trim();
+                    
+                    if (password !== '115ganteng') {
+                        errorMsg.style.display = 'block';
+                        passwordInput.style.borderColor = 'var(--danger)';
+                        passwordInput.focus();
+                        return;
+                    }
+                    
                     const modal = document.getElementById('clearLocalModal');
                     if (modal) {
                         modal.remove();
                     }
-                    resolve(false);
-                };
-                
-                setTimeout(() => {
-                    const closeBtn = document.getElementById('closeClearLocalModal');
-                    const cancelBtn = document.getElementById('cancelClearLocal');
-                    const confirmBtn = document.getElementById('confirmClearLocal');
-                    const passwordInput = document.getElementById('clearLocalPassword');
-                    const errorMsg = document.getElementById('clearLocalError');
                     
-                    if (closeBtn) {
-                        closeBtn.addEventListener('click', closeModal);
-                    }
+                    showAlert('addAssetAlert', '🔄 Menghapus data lokal...', 'info');
                     
-                    if (cancelBtn) {
-                        cancelBtn.addEventListener('click', closeModal);
-                    }
-                    
-                    if (confirmBtn && passwordInput) {
-                        confirmBtn.addEventListener('click', async () => {
-                            const password = passwordInput.value.trim();
-                            
-                            if (password !== '115ganteng') {
-                                errorMsg.style.display = 'block';
-                                passwordInput.style.borderColor = 'var(--danger)';
-                                passwordInput.focus();
-                                return;
+                    try {
+                        // ============ HAPUS SEMUA STORE ============
+                        const objectStores = ['assets', 'photos', 'backups', 'settings', 'syncQueue', 'user_activities', 'sync_metadata'];
+                        
+                        for (const storeName of objectStores) {
+                            try {
+                                await new Promise((storeResolve) => {
+                                    const transaction = indexedDBInstance.transaction([storeName], 'readwrite');
+                                    const store = transaction.objectStore(storeName);
+                                    const request = store.clear();
+                                    
+                                    request.onsuccess = function() {
+                                        console.log(`✅ Cleared ${storeName}`);
+                                        storeResolve();
+                                    };
+                                    
+                                    request.onerror = function(event) {
+                                        console.error(`❌ Error clearing ${storeName}:`, event.target.error);
+                                        storeResolve();
+                                    };
+                                });
+                            } catch (err) {
+                                console.error(`❌ Error with ${storeName}:`, err);
                             }
-                            
-                            const modal = document.getElementById('clearLocalModal');
-                            if (modal) {
-                                modal.remove();
-                            }
-                            
-                            showAlert('addAssetAlert', '🔄 Menghapus data lokal...', 'info');
+                        }
+                        
+                        // ============ RESET TIMESTAMP SYNC ============
+                        // Reset lastPullTimestamp ke 0 agar ambil semua data dari cloud
+                        await saveLastPullTimestamp(0);
+                        console.log("✅ Reset lastPullTimestamp to 0");
+                        
+                        // Hapus juga dari localStorage
+                        localStorage.removeItem('theme');
+                        localStorage.removeItem('lastPullTimestamp');
+                        
+                        // Reset array global
+                        assets = [];
+                        pendingSyncAssets = [];
+                        
+                        // Update UI
+                        updateAssetSelects();
+                        displayAssets();
+                        updateDashboard();
+                        loadBackupHistory();
+                        
+                        showAlert('addAssetAlert', '✅ Data lokal berhasil dihapus! Mengambil data dari cloud...', 'success');
+                        
+                        // ============ AMBIL DATA DARI CLOUD ============
+                        if (navigator.onLine && isFirebaseConnected) {
+                            showAlert('addAssetAlert', '🔄 Mengambil data dari cloud...', 'info');
                             
                             try {
-                                const objectStores = ['assets', 'photos', 'backups', 'settings', 'syncQueue'];
+                                // Panggil firstTimeSyncFromCloud untuk ambil semua data
+                                const cloudAssets = await firstTimeSyncFromCloud();
                                 
-                                for (const storeName of objectStores) {
-                                    try {
-                                        await new Promise((storeResolve, storeReject) => {
-                                            const transaction = indexedDBInstance.transaction([storeName], 'readwrite');
-                                            const store = transaction.objectStore(storeName);
-                                            const request = store.clear();
-                                            
-                                            request.onsuccess = function() {
-                                                console.log(`✅ Cleared ${storeName}`);
-                                                storeResolve();
-                                            };
-                                            
-                                            request.onerror = function(event) {
-                                                console.error(`❌ Error clearing ${storeName}:`, event.target.error);
-                                                storeResolve();
-                                            };
-                                        });
-                                    } catch (err) {
-                                        console.error(`❌ Error with ${storeName}:`, err);
-                                    }
+                                if (cloudAssets && cloudAssets.length > 0) {
+                                    assets = cloudAssets;
+                                    console.log(`✅ Berhasil mengambil ${cloudAssets.length} asset dari cloud`);
+                                    
+                                    showAlert('addAssetAlert', `✅ Berhasil mengambil ${cloudAssets.length} asset dari cloud!`, 'success');
+                                    
+                                    // Update UI
+                                    updateAssetSelects();
+                                    displayAssets();
+                                    updateDashboard();
+                                } else {
+                                    console.log("ℹ️ Tidak ada data di cloud");
+                                    showAlert('addAssetAlert', 'ℹ️ Tidak ada data di cloud. Mulai dengan menambah item baru.', 'info');
                                 }
-                                
-                                localStorage.removeItem('theme');
-                                
-                                assets = [];
-                                pendingSyncAssets = [];
-                                
-                                updateAssetSelects();
-                                displayAssets();
-                                updateDashboard();
-                                loadBackupHistory();
-                                
-                                showAlert('addAssetAlert', '✅ Data lokal berhasil dihapus!', 'success');
-                                resolve(true);
-                                
-                            } catch (error) {
-                                console.error("❌ Error clearing local data:", error);
-                                showAlert('addAssetAlert', `❌ Error menghapus data: ${error.message}`, 'danger');
-                                resolve(false);
+                            } catch (syncError) {
+                                console.error("❌ Gagal sync dari cloud:", syncError);
+                                showAlert('addAssetAlert', '❌ Gagal mengambil data dari cloud. Refresh halaman dan coba sync manual.', 'danger');
                             }
-                        });
+                        } else {
+                            showAlert('addAssetAlert', '⚠️ Anda offline. Data lokal kosong. Online kan untuk mengambil data dari cloud.', 'warning');
+                        }
+                        
+                        resolve(true);
+                        
+                    } catch (error) {
+                        console.error("❌ Error clearing local data:", error);
+                        showAlert('addAssetAlert', `❌ Error menghapus data: ${error.message}`, 'danger');
+                        resolve(false);
                     }
-                    
-                    const modal = document.getElementById('clearLocalModal');
-                    if (modal) {
-                        modal.addEventListener('click', (e) => {
-                            if (e.target === modal) {
-                                closeModal();
-                            }
-                        });
+                });
+            }
+            
+            const modal = document.getElementById('clearLocalModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal();
                     }
-                    
-                    if (passwordInput) {
-                        passwordInput.addEventListener('keypress', (e) => {
-                            if (e.key === 'Enter') {
-                                document.getElementById('confirmClearLocal')?.click();
-                            }
-                        });
-                        passwordInput.focus();
+                });
+            }
+            
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('confirmClearLocal')?.click();
                     }
-                }, 100);
-            });
-        }
+                });
+                passwordInput.focus();
+            }
+        }, 100);
+    });
+}
 
 // ==============================================
 // AUTHENTICATION SYSTEM
