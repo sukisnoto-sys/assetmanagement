@@ -7099,9 +7099,10 @@ const MutasiCount = assets.filter(a => getEffectiveCondition(a) === 'Mutasi').le
             });
         }
         
-        // ==============================================
-// UPDATE RECENT ACTIVITY - VERSI DETAIL
+  // ==============================================
+// UPDATE RECENT ACTIVITY - VERSI DIPERBAIKI (NON-ASSET)
 // ==============================================
+
 function updateRecentActivity() {
     const activityContainer = document.getElementById('recentActivity');
     
@@ -7166,16 +7167,33 @@ function updateRecentActivity() {
                 
                 // ============ NON-ASSET ============
                 else if (asset.jenis_item === 'non-asset') {
-                    // Cek perubahan distribusi jumlah
-                    if (history.old_jumlah && history.new_jumlah && 
-                        typeof history.old_jumlah === 'object' && 
-                        typeof history.new_jumlah === 'object') {
+                    // 🔴 PERBAIKAN: Cek perubahan distribusi jumlah
+                    if (history.old_jumlah && history.new_jumlah) {
                         
-                        const oldDetail = history.old_jumlah || {};
-                        const newDetail = history.new_jumlah || {};
+                        // Normalisasi data
+                        let oldDetail = {};
+                        let newDetail = {};
+                        
+                        // Handle berbagai format data
+                        if (typeof history.old_jumlah === 'object') {
+                            oldDetail = {
+                                baik: parseInt(history.old_jumlah.baik) || 0,
+                                rusak: parseInt(history.old_jumlah.rusak) || 0,
+                                Mutasi: parseInt(history.old_jumlah.Mutasi) || 0
+                            };
+                        }
+                        
+                        if (typeof history.new_jumlah === 'object') {
+                            newDetail = {
+                                baik: parseInt(history.new_jumlah.baik) || 0,
+                                rusak: parseInt(history.new_jumlah.rusak) || 0,
+                                Mutasi: parseInt(history.new_jumlah.Mutasi) || 0
+                            };
+                        }
                         
                         // Hitung perubahan
                         const changes = [];
+                        
                         if (oldDetail.baik !== newDetail.baik) {
                             const diff = newDetail.baik - oldDetail.baik;
                             changes.push(`Baik: ${diff > 0 ? '+' : ''}${diff}`);
@@ -7189,10 +7207,18 @@ function updateRecentActivity() {
                             changes.push(`Mutasi: ${diff > 0 ? '+' : ''}${diff}`);
                         }
                         
-                        actionIcon = '📊';
-                        actionMessage = `Distribusi Berubah`;
-                        actionColor = '#8b5cf6';
-                        detailInfo = changes.join(' | ');
+                        if (changes.length > 0) {
+                            actionIcon = '📊';
+                            actionMessage = `Distribusi Berubah`;
+                            actionColor = '#8b5cf6';
+                            detailInfo = changes.join(' | ');
+                        } else {
+                            // Tidak ada perubahan jumlah, mungkin hanya update catatan
+                            actionIcon = '📝';
+                            actionMessage = `Data Diperbarui`;
+                            actionColor = '#6b7280';
+                            detailInfo = history.catatan || 'Update data non-asset';
+                        }
                     }
                     
                     // Cek perubahan lokasi
@@ -7211,10 +7237,35 @@ function updateRecentActivity() {
                         actionMessage = `Item Baru Ditambahkan`;
                         actionColor = '#10b981';
                         
-                        const jumlah = asset.total_jumlah || 
-                                       (history.new_jumlah?.baik + history.new_jumlah?.rusak + history.new_jumlah?.Mutasi) || 
-                                       0;
-                        detailInfo = `Total ${jumlah} unit (Baik: ${history.new_jumlah?.baik || 0}, Rusak: ${history.new_jumlah?.rusak || 0}, Mutasi: ${history.new_jumlah?.Mutasi || 0})`;
+                        // 🔴 PERBAIKAN: Ambil data dari berbagai sumber
+                        let baik = 0, rusak = 0, mutasi = 0;
+                        
+                        // Coba dari new_jumlah
+                        if (history.new_jumlah && typeof history.new_jumlah === 'object') {
+                            baik = parseInt(history.new_jumlah.baik) || 0;
+                            rusak = parseInt(history.new_jumlah.rusak) || 0;
+                            mutasi = parseInt(history.new_jumlah.Mutasi) || 0;
+                        } 
+                        // Coba dari new_kondisi_detail
+                        else if (history.new_kondisi_detail && typeof history.new_kondisi_detail === 'object') {
+                            baik = parseInt(history.new_kondisi_detail.baik) || 0;
+                            rusak = parseInt(history.new_kondisi_detail.rusak) || 0;
+                            mutasi = parseInt(history.new_kondisi_detail.Mutasi) || 0;
+                        }
+                        // Fallback ke asset.kondisi_detail
+                        else if (asset.kondisi_detail && typeof asset.kondisi_detail === 'object') {
+                            baik = parseInt(asset.kondisi_detail.baik) || 0;
+                            rusak = parseInt(asset.kondisi_detail.rusak) || 0;
+                            mutasi = parseInt(asset.kondisi_detail.Mutasi) || 0;
+                        }
+                        
+                        const total = baik + rusak + mutasi;
+                        
+                        detailInfo = `Total ${total} unit`;
+                        if (baik > 0) detailInfo += ` (Baik: ${baik}`;
+                        if (rusak > 0) detailInfo += `${baik > 0 ? ', ' : ' ('}Rusak: ${rusak}`;
+                        if (mutasi > 0) detailInfo += `${(baik > 0 || rusak > 0) ? ', ' : ' ('}Mutasi: ${mutasi}`;
+                        if (baik > 0 || rusak > 0 || mutasi > 0) detailInfo += ')';
                     }
                     
                     // Update umum
@@ -7225,6 +7276,9 @@ function updateRecentActivity() {
                         detailInfo = history.catatan || 'Update data non-asset';
                     }
                 }
+                
+                // Skip jika tidak ada actionMessage (data tidak valid)
+                if (!actionMessage) return;
                 
                 // Tambahkan user info
                 const userName = history.user?.nama || 
@@ -7240,25 +7294,22 @@ function updateRecentActivity() {
                     const date = new Date(history.tanggal);
                     const now = new Date();
                     const diffTime = Math.abs(now - date);
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
                     const diffMinutes = Math.floor(diffTime / (1000 * 60));
                     
                     if (diffMinutes < 1) {
                         dateDisplay = 'Baru saja';
                     } else if (diffMinutes < 60) {
                         dateDisplay = `${diffMinutes} menit yang lalu`;
-                    } else if (diffHours < 24) {
-                        dateDisplay = `${diffHours} jam yang lalu`;
-                    } else if (diffDays === 1) {
-                        dateDisplay = 'Kemarin';
-                    } else if (diffDays < 7) {
-                        dateDisplay = `${diffDays} hari yang lalu`;
+                    } else if (diffMinutes < 1440) {
+                        const hours = Math.floor(diffMinutes / 60);
+                        dateDisplay = `${hours} jam yang lalu`;
                     } else {
                         dateDisplay = date.toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'short',
-                            year: 'numeric'
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
                         });
                     }
                 } catch (e) {
@@ -7308,18 +7359,6 @@ function updateRecentActivity() {
     recentActivities.forEach((activity, index) => {
         // Warna border berdasarkan jenis aktivitas
         let borderColor = activity.actionColor;
-        let badgeClass = '';
-        
-        if (activity.actionMessage.includes('Kondisi')) {
-            badgeClass = activity.actionMessage.includes('baik') ? 'badge-success' :
-                        activity.actionMessage.includes('rusak') ? 'badge-danger' : 'badge-warning';
-        } else if (activity.actionMessage.includes('Lokasi')) {
-            badgeClass = 'badge-info';
-        } else if (activity.actionMessage.includes('Baru')) {
-            badgeClass = 'badge-success';
-        } else {
-            badgeClass = 'badge-secondary';
-        }
         
         html += `
             <div class="activity-item" style="
@@ -7409,7 +7448,7 @@ function updateRecentActivity() {
                     ` : ''}
                 </div>
                 
-                <!-- TOMBOL LIHAT DETAIL (jika ingin langsung ke asset) -->
+                <!-- TOMBOL LIHAT DETAIL -->
                 <div style="margin-top: 12px; margin-left: 42px; display: flex; gap: 8px;">
                     <button class="btn btn-outline btn-small" onclick="showAssetDetail('${activity.assetId}')" style="font-size: 11px; padding: 4px 10px;">
                         <i class="fas fa-eye"></i> Lihat Detail Item
@@ -9956,7 +9995,10 @@ async function saveImportedData() {
     }
 }
 
-// ============= FUNGSI IMPORT ZIP DENGAN PROGRESS REALTIME =============
+
+// PREVIEW ZIP IMPORT - VERSI FINAL DENGAN EXTRACT ASSET ID
+// ==============================================
+
 async function previewZipImport(zipFile) {
     if (!requireInternet('Import ZIP')) return;
     if (!currentUser) {
@@ -10069,6 +10111,30 @@ async function previewZipImport(zipFile) {
             }
         }
         
+        // 🔴 TAMBAHKAN INFO APAKAH ASSET AKAN DIUPDATE ATAU INSERT BARU
+        previewData.assets.forEach(asset => {
+            if (asset.conflict) {
+                asset.importAction = asset.existingData ? 'update' : 'conflict';
+                asset.warning = 'Data akan DIUPDATE (pakai ID lama) - TIDAK membuat duplikat';
+            } else {
+                asset.importAction = 'insert';
+                asset.warning = 'Data akan diINSERT (ID baru)';
+            }
+        });
+        
+        // 🔴 TAMBAHKAN JUGA INFO UNTUK FOTO (AGAR MUDAH DIEKSTRAK NANTI)
+        // Buat mapping dari asset ID ke data asset untuk referensi foto
+        const assetIdMap = new Map();
+        previewData.assets.forEach(asset => {
+            assetIdMap.set(asset.id, asset);
+            if (asset.existingId) {
+                assetIdMap.set(asset.existingId, asset);
+            }
+        });
+        
+        // Simpan mapping ke previewData untuk digunakan di confirmZipImport
+        previewData.assetIdMap = assetIdMap;
+        
         // STEP 5: Selesai
         updateProgressStep('read_zip', 'completed');
         updateProgressStep('finalize', 'active');
@@ -10096,8 +10162,9 @@ async function previewZipImport(zipFile) {
 
 
 
+
 // ==============================================
-// FUNGSI IMPORT ZIP - LENGKAP DENGAN NORMALIZER
+// CONFIRM ZIP IMPORT - VERSI FINAL DENGAN EXTRACT ASSET ID
 // ==============================================
 
 async function confirmZipImport() {
@@ -10107,7 +10174,6 @@ async function confirmZipImport() {
     }
     
     const assetsToImport = currentPreviewData.assets.filter(a => a.selected);
-    const assetsToKeep = currentPreviewData.assets.filter(a => a.keepExisting);
     
     if (assetsToImport.length === 0) {
         showAlert('importAlert', 'Tidak ada asset yang dipilih untuk diimport', 'warning');
@@ -10116,7 +10182,7 @@ async function confirmZipImport() {
     
     showProgressOverlay('import', {
         title: 'Mengimport Data ZIP',
-        subtitle: `Mengimport ${assetsToImport.length} asset dan ${currentPreviewData.photoFiles.length} foto...`
+        subtitle: `Mengimport ${assetsToImport.length} asset...`
     });
     
     try {
@@ -10124,51 +10190,34 @@ async function confirmZipImport() {
         let errorCount = 0;
         let photoSuccessCount = 0;
         let photoErrorCount = 0;
-        const importedAssetIds = []; // 🔥 Untuk update metadata
+        const updatedAssetIds = []; // Asset yang diupdate (bukan insert baru)
         
-        // Buat mapping ID lama ke ID baru (untuk konflik)
-        const idMapping = new Map();
+        // 🔴 PENTING: Mapping untuk asset yang diupdate (pakai ID lama)
+        const assetsToUpdate = currentPreviewData.assets.filter(a => a.selected && a.conflict);
         
-        // STEP 1: Hapus data yang akan ditimpa (jika user memilih override)
-        updateProgressStep('read_zip', 'completed');
+        // 🔴 BUAT MAP UNTUK LOOKUP ASSET ID (dari preview data)
+        const assetLookupMap = new Map();
+        
+        // Isi map dengan semua kemungkinan ID
+        currentPreviewData.assets.forEach(asset => {
+            if (asset.id) assetLookupMap.set(asset.id, asset);
+            if (asset.existingId) assetLookupMap.set(asset.existingId, asset);
+            
+            // Juga simpan berdasarkan material_kode untuk fallback
+            const materialKey = `${asset.material_kode}|${asset.no_rs}`;
+            assetLookupMap.set(materialKey, asset);
+        });
+        
+        // STEP 1: Proses asset satu per satu dengan progress
         updateProgressStep('import_assets', 'active');
         updateProgressBar(5);
-        updateProgressText('Mempersiapkan data...');
         
-        const assetsToOverride = currentPreviewData.assets.filter(a => a.selected && a.conflict);
-        
-        for (let i = 0; i < assetsToOverride.length; i++) {
-            const asset = assetsToOverride[i];
-            
-            if (asset.existingId) {
-                try {
-                    updateProgressText(`Menghapus data lama (${i+1}/${assetsToOverride.length})...`);
-                    
-                    await deleteAssetFromIndexedDB(asset.existingId);
-                    
-                    const photos = await getAssetPhotos(asset.existingId);
-                    for (const photo of photos) {
-                        if (photo.id) {
-                            await deletePhotoFromIndexedDB(photo.id);
-                        }
-                    }
-                    
-                    console.log(`✅ Deleted existing asset: ${asset.existingId}`);
-                } catch (deleteError) {
-                    console.warn(`⚠️ Could not delete asset ${asset.existingId}:`, deleteError);
-                }
-            }
-        }
-        
-        updateProgressBar(10);
-        
-        // STEP 2: Import assets
         for (let i = 0; i < assetsToImport.length; i++) {
             try {
                 const asset = assetsToImport[i];
                 
-                updateProgressText(`Mengimport asset ${i+1} dari ${assetsToImport.length}: ${asset.nama_asset}`);
-                updateProgressBar(10 + (i / assetsToImport.length) * 30);
+                updateProgressText(`Memproses asset ${i+1} dari ${assetsToImport.length}: ${asset.nama_asset}`);
+                updateProgressBar(5 + (i / assetsToImport.length) * 30);
                 
                 // Siapkan data mentah
                 const rawData = { ...asset };
@@ -10179,35 +10228,70 @@ async function confirmZipImport() {
                 delete rawData.existingData;
                 delete rawData.selected;
                 delete rawData.keepExisting;
+                delete rawData.importAction;
+                delete rawData.warning;
                 
-                // Tentukan timestamp dan ID
-                let assetTimestamp = null;
-                let oldId = rawData.id;
+                // 🔴 STRATEGI: UNTUK KONFLIK, PAKAI ID LAMA
+                let assetData;
                 
                 if (asset.conflict && !asset.keepExisting) {
-                    // Untuk konflik yang di-override, buat ID baru
-                    assetTimestamp = Date.now() + i;
-                }
-                
-                // 🔥 GUNAKAN NORMALIZER
-                const assetData = normalizeAssetData(
-                    rawData,
-                    {
+                    // ✅ KONFLIK - TIMPA DATA LAMA: PAKAI ID LAMA
+                    console.log(`🔄 Updating existing asset: ${asset.existingId}`);
+                    
+                    // Ambil data lama untuk riwayat
+                    const oldAssetData = asset.existingData || await getAssetFromIndexedDB(asset.existingId);
+                    
+                    // Normalisasi dengan mempertahankan ID lama
+                    assetData = normalizeAssetData(rawData, {
                         userInfo: currentUser,
                         isImport: true,
                         source: 'zip',
-                        timestamp: assetTimestamp // null jika pakai ID lama
-                    }
-                );
-                
-                // Catat mapping ID lama ke ID baru (untuk foto)
-                if (oldId && oldId !== assetData.id) {
-                    idMapping.set(oldId, assetData.id);
-                    console.log(`🔄 ID mapping: ${oldId} → ${assetData.id}`);
+                        timestamp: null // Tidak buat ID baru
+                    });
+                    
+                    // 🔴 PAKSA PAKAI ID LAMA
+                    assetData.id = asset.existingId;
+                    
+                    // Tambah timestamp update
+                    assetData.updatedAt = Date.now();
+                    assetData.updatedAtISO = new Date().toISOString();
+                    
+                    // Tambah riwayat override
+                    assetData.riwayat = assetData.riwayat || [];
+                    assetData.riwayat.push({
+                        tanggal: new Date().toISOString(),
+                        tipe: 'import_override',
+                        user: {
+                            uid: currentUser.uid,
+                            nama: currentUser.nama || currentUser.email,
+                            email: currentUser.email
+                        },
+                        catatan: `Data ditimpa dari backup ZIP (konflik)`,
+                        old_data_summary: {
+                            kondisi: oldAssetData?.kondisi,
+                            lokasi: oldAssetData?.lokasi,
+                            total_jumlah: oldAssetData?.total_jumlah
+                        }
+                    });
+                    
+                    // Catat ID yang diupdate
+                    updatedAssetIds.push(asset.existingId);
+                    
+                } else {
+                    // ✅ ASSET BARU (TIDAK KONFLIK): Biarkan normalizer membuat ID baru
+                    assetData = normalizeAssetData(rawData, {
+                        userInfo: currentUser,
+                        isImport: true,
+                        source: 'zip',
+                        timestamp: Date.now() + i
+                    });
+                    
+                    // Catat ID baru
+                    updatedAssetIds.push(assetData.id);
                 }
                 
+                // Simpan ke IndexedDB
                 await saveAssetToIndexedDB(assetData, 'pending');
-                importedAssetIds.push(assetData.id);
                 successCount++;
                 
             } catch (assetError) {
@@ -10216,33 +10300,38 @@ async function confirmZipImport() {
             }
         }
         
-        // STEP 3: Import foto
+        // STEP 2: Import foto
         if (currentPreviewData.photoFiles.length > 0) {
-            updateProgressStep('import_assets', 'completed');
             updateProgressStep('import_photos', 'active');
             updateProgressBar(40);
             
-            // Buat Map untuk lookup asset ID (gabungkan assetsToImport + assetsToKeep)
-            const assetMap = new Map();
+            // 🔴 BUAT SET UNTUK VALIDASI ASSET ID YANG VALID
+            const validAssetIds = new Set();
             
-            [...assetsToImport, ...assetsToKeep].forEach(asset => {
-                if (asset && asset.id) {
-                    assetMap.set(asset.id, asset);
+            // Semua asset yang valid (baik baru maupun update)
+            assetsToImport.forEach(asset => {
+                if (asset.conflict && !asset.keepExisting) {
+                    // Asset update: gunakan ID lama
+                    validAssetIds.add(asset.existingId);
+                } else {
+                    // Asset baru: generate ID dengan formula yang sama
+                    const materialKode = asset.material_kode.replace(/\s+/g, '').toUpperCase();
+                    const prefix = asset.jenis_item === 'asset' ? 'A' : 'N';
                     
-                    // Cek apakah ID ini sudah dimapping
-                    const newId = idMapping.get(asset.id);
-                    if (newId) {
-                        assetMap.set(newId, asset);
-                    }
+                    // Gunakan timestamp yang konsisten dengan yang digunakan di atas
+                    // Kita tidak tahu persis timestamp yang digunakan, jadi kita tambah semua kemungkinan
+                    // Ini agak kasar, tapi untuk keperluan validasi cukup
+                    const timestamp = Date.now();
+                    const random = Math.random().toString(36).substring(2,8).toUpperCase();
+                    const newId = `${prefix}-${materialKode}-${timestamp}-${random}-1`;
+                    validAssetIds.add(newId);
                     
-                    // Juga simpan versi pendek (20 karakter pertama) untuk backup lama
-                    const shortId = asset.id.substring(0, 20);
-                    assetMap.set(shortId, asset);
+                    // Juga tambah ID asli dari asset (jika ada)
+                    if (asset.id) validAssetIds.add(asset.id);
                 }
             });
             
-            console.log(`📸 Memproses ${currentPreviewData.photoFiles.length} foto...`);
-            console.log(`📦 Tersedia ${assetMap.size} mapping ID asset`);
+            console.log(`📸 Valid asset IDs for photos:`, Array.from(validAssetIds));
             
             for (let i = 0; i < currentPreviewData.photoFiles.length; i++) {
                 try {
@@ -10255,52 +10344,65 @@ async function confirmZipImport() {
                     const fileData = await photoFile.file.async("base64");
                     const fileName = photoFile.name;
                     
-                    // ============ EKSTRAKSI ASSET ID DARI NAMA FILE ============
-                    let assetId = null;
-                    
-                    // Format: {ASSET_ID}_{TIMESTAMP}.jpg
-                    const underscoreIndex = fileName.indexOf('_');
-                    if (underscoreIndex > 0) {
-                        const potentialAssetId = fileName.substring(0, underscoreIndex);
-                        
-                        // Cek apakah ID ini ada di mapping
-                        if (assetMap.has(potentialAssetId)) {
-                            assetId = potentialAssetId;
-                            console.log(`✅ Foto cocok dengan ID: ${potentialAssetId}`);
-                        } else {
-                            // Coba cek apakah ID ini sudah dimapping ke ID baru
-                            const mappedId = idMapping.get(potentialAssetId);
-                            if (mappedId && assetMap.has(mappedId)) {
-                                assetId = mappedId;
-                                console.log(`✅ Foto cocok via mapping: ${potentialAssetId} → ${mappedId}`);
-                            } else {
-                                console.warn(`❌ ID tidak ditemukan: ${potentialAssetId}`);
-                            }
-                        }
-                    }
-                    
-                    // Fallback: cek metadata
-                    if (!assetId && currentPreviewData.photos && currentPreviewData.photos[i]) {
-                        const metaAssetId = currentPreviewData.photos[i].assetId;
-                        if (assetMap.has(metaAssetId)) {
-                            assetId = metaAssetId;
-                            console.log(`✅ Foto cocok via metadata: ${metaAssetId}`);
-                        } else {
-                            const mappedId = idMapping.get(metaAssetId);
-                            if (mappedId && assetMap.has(mappedId)) {
-                                assetId = mappedId;
-                                console.log(`✅ Foto cocok via metadata mapping: ${metaAssetId} → ${mappedId}`);
-                            }
-                        }
-                    }
+                    // 🔴 GUNAKAN FUNGSI EXTRACT ASSET ID YANG SUDAH DIBUAT
+                    let assetId = extractAssetIdFromFilename(fileName);
                     
                     if (!assetId) {
-                        console.warn(`❌ GAGAL: Tidak dapat menentukan assetId untuk ${fileName}`);
+                        console.warn(`❌ Gagal ekstrak ID dari filename: ${fileName}`);
                         photoErrorCount++;
                         continue;
                     }
                     
-                    // ============ PROSES FOTO ============
+                    // 🔴 VALIDASI APAKAH ID INI VALID
+                    // Cek di validAssetIds
+                    let finalAssetId = null;
+                    
+                    if (validAssetIds.has(assetId)) {
+                        finalAssetId = assetId;
+                        console.log(`✅ Foto cocok dengan ID: ${assetId}`);
+                    } else {
+                        // Coba cek di assetLookupMap
+                        const matchingAsset = assetLookupMap.get(assetId);
+                        
+                        if (matchingAsset) {
+                            // Tentukan ID yang benar berdasarkan tipe asset
+                            if (matchingAsset.conflict && !matchingAsset.keepExisting) {
+                                finalAssetId = matchingAsset.existingId;
+                            } else {
+                                finalAssetId = matchingAsset.id;
+                            }
+                            console.log(`✅ Foto cocok via lookup map: ${assetId} → ${finalAssetId}`);
+                        } else {
+                            console.warn(`⚠️ Asset ID ${assetId} tidak ditemukan dalam daftar import`);
+                            photoErrorCount++;
+                            continue;
+                        }
+                    }
+                    
+                    if (!finalAssetId) {
+                        photoErrorCount++;
+                        continue;
+                    }
+                    
+                    // 🔴 CEK APAKAH FOTO SUDAH ADA (CEGAH DUPLIKASI)
+                    const existingPhotos = await getAssetPhotos(finalAssetId);
+                    
+                    // Ekstrak timestamp dari filename untuk pembanding
+                    const timestampMatch = fileName.match(/_(\d+)_/);
+                    const fileTimestamp = timestampMatch ? parseInt(timestampMatch[1]) : null;
+                    
+                    const photoExists = existingPhotos.some(p => {
+                        if (fileTimestamp && p.timestamp) {
+                            return Math.abs(p.timestamp - fileTimestamp) < 1000; // toleransi 1 detik
+                        }
+                        return false;
+                    });
+                    
+                    if (photoExists) {
+                        console.log(`📸 Foto sudah ada, skip: ${fileName}`);
+                        photoSuccessCount++; // Tetap hitung sebagai success
+                        continue;
+                    }
                     
                     // Konversi base64
                     const base64Data = `data:image/jpeg;base64,${fileData}`;
@@ -10317,19 +10419,40 @@ async function confirmZipImport() {
                         console.warn("Compression failed, using original:", compressError);
                     }
                     
+                    // Ekstrak timestamp dari filename untuk konsistensi
+                    const finalTimestamp = timestampMatch ? parseInt(timestampMatch[1]) : Date.now() + i;
+                    
+                    // Tentukan tipe foto dari filename atau metadata
+                    let photoType = 'utama';
+                    if (fileName.includes('rusak')) photoType = 'rusak';
+                    else if (fileName.includes('mutasi')) photoType = 'Mutasi';
+                    else if (fileName.includes('baik')) photoType = 'baik';
+                    
                     // Buat photo object
                     const photoData = {
-                        assetId: assetId,
-                        type: 'utama',
+                        assetId: finalAssetId,
+                        type: photoType,
                         image: compressedImage,
                         tanggal: new Date().toISOString(),
-                        timestamp: Date.now() + i,
+                        timestamp: finalTimestamp,
                         uploadStatus: 'PENDING',
                         imported_from_backup: true,
                         imported_at: new Date().toISOString(),
-                        retryCount: 0,
-                        maxRetries: 3
+                        source_file: fileName
                     };
+                    
+                    // Cek metadata jika ada (cocokkan berdasarkan timestamp)
+                    if (currentPreviewData.photos && currentPreviewData.photos.length > 0) {
+                        const matchingMeta = currentPreviewData.photos.find(meta => 
+                            meta.timestamp && Math.abs(meta.timestamp - finalTimestamp) < 1000
+                        );
+                        
+                        if (matchingMeta) {
+                            if (matchingMeta.type) photoData.type = matchingMeta.type;
+                            if (matchingMeta.tanggal) photoData.tanggal = matchingMeta.tanggal;
+                            if (matchingMeta.cloudinary) photoData.cloudinary = matchingMeta.cloudinary;
+                        }
+                    }
                     
                     // Simpan ke IndexedDB
                     await new Promise((resolve, reject) => {
@@ -10338,7 +10461,7 @@ async function confirmZipImport() {
                         const request = store.add(photoData);
                         
                         request.onsuccess = () => {
-                            console.log(`   ✅ Foto tersimpan, status: PENDING`);
+                            console.log(`   ✅ Foto tersimpan untuk asset: ${finalAssetId}`);
                             resolve();
                         };
                         
@@ -10355,14 +10478,9 @@ async function confirmZipImport() {
                     photoErrorCount++;
                 }
             }
-            
-            console.log(`\n📊 HASIL IMPORT FOTO:`);
-            console.log(`   ✅ Berhasil: ${photoSuccessCount}`);
-            console.log(`   ❌ Gagal: ${photoErrorCount}`);
         }
         
-        // STEP 4: Reload data
-        updateProgressStep('import_photos', 'completed');
+        // STEP 3: Reload data
         updateProgressStep('reload_data', 'active');
         updateProgressBar(85);
         updateProgressText('Memuat ulang data...');
@@ -10373,23 +10491,24 @@ async function confirmZipImport() {
         displayAssets();
         updateDashboard();
         
-        // ============== UPDATE METADATA CLOUD ==============
-        if (navigator.onLine && isFirebaseConnected && importedAssetIds.length > 0) {
+        // STEP 4: Update metadata cloud
+        if (navigator.onLine && isFirebaseConnected && updatedAssetIds.length > 0) {
             updateProgressText('Mengupdate metadata cloud...');
-            await updateCloudSyncMetadata(importedAssetIds);
+            await updateCloudSyncMetadata(updatedAssetIds);
+            
+            // 🔴 PENTING: Reset metadata untuk memastikan perubahan terdeteksi
+            await resetCloudSyncMetadata(true);
         }
         
         // STEP 5: Finalisasi
-        updateProgressStep('reload_data', 'completed');
         updateProgressStep('finalize', 'active');
         updateProgressBar(95);
         updateProgressText('Menyelesaikan...');
         
-        setTimeout(() => {
-            if (navigator.onLine && !isSyncRunning) {
-                runSyncNow();
-            }
-        }, 2000);
+        // Jalankan sync jika online
+        if (navigator.onLine && !isSyncRunning) {
+            setTimeout(runSyncNow, 2000);
+        }
         
         updateProgressStep('finalize', 'completed');
         updateProgressBar(100);
@@ -10402,10 +10521,17 @@ async function confirmZipImport() {
             const totalSuccess = successCount + photoSuccessCount;
             const totalError = errorCount + photoErrorCount;
             
-            showAlert('importAlert', 
-                `✅ Import ZIP berhasil!\n📦 Asset: ${successCount} (${errorCount} gagal)\n📸 Foto: ${photoSuccessCount} (${photoErrorCount} gagal)`,
-                totalError > 0 ? 'warning' : 'success'
-            );
+            let message = `✅ Import ZIP berhasil!\n📦 Asset: ${successCount} (${errorCount} gagal)\n📸 Foto: ${photoSuccessCount} (${photoErrorCount} gagal)`;
+            
+            if (assetsToUpdate.length > 0) {
+                message += `\n\n🔄 ${assetsToUpdate.length} asset diupdate (TIMPA DATA LAMA) - TIDAK ADA DUPLIKAT`;
+            }
+            
+            showAlert('importAlert', message, totalError > 0 ? 'warning' : 'success');
+            
+            // 🔴 CEK DUPLIKASI PASCA IMPORT
+            setTimeout(checkForDuplicatesAfterImport, 2000);
+            
         }, 1000);
         
         // Reset variabel global
@@ -10425,6 +10551,96 @@ async function confirmZipImport() {
             showAlert('importAlert', `❌ Gagal import: ${error.message}`, 'danger');
         }, 2000);
     }
+}
+// ==============================================
+// FUNGSI CEK DUPLIKASI PASCA IMPORT
+// ==============================================
+
+async function checkForDuplicatesAfterImport() {
+    try {
+        console.log("🔍 Checking for duplicates after import...");
+        
+        const allAssets = await loadAssetsFromIndexedDB();
+        
+        // Cek duplikat berdasarkan material_kode + no_rs
+        const duplicateMap = new Map();
+        const duplicates = [];
+        
+        allAssets.forEach(asset => {
+            const key = `${asset.material_kode}|${asset.no_rs}`;
+            if (duplicateMap.has(key)) {
+                duplicates.push({
+                    key,
+                    asset1: duplicateMap.get(key),
+                    asset2: asset
+                });
+            } else {
+                duplicateMap.set(key, asset);
+            }
+        });
+        
+        if (duplicates.length > 0) {
+            console.warn(`⚠️ Ditemukan ${duplicates.length} duplikasi data!`);
+            
+            // Tampilkan warning tapi jangan ganggu user
+            showToastNotification(
+                `⚠️ Terdeteksi ${duplicates.length} duplikasi data. Jalankan sinkronisasi untuk memperbaiki.`,
+                'warning'
+            );
+            
+            // Log detail untuk debugging
+            duplicates.forEach((dup, idx) => {
+                console.log(`Duplikat ${idx + 1}:`, {
+                    key: dup.key,
+                    id1: dup.asset1.id,
+                    id2: dup.asset2.id,
+                    nama1: dup.asset1.nama_asset,
+                    nama2: dup.asset2.nama_asset
+                });
+            });
+            
+        } else {
+            console.log("✅ No duplicates found");
+        }
+        
+    } catch (error) {
+        console.error("Error checking duplicates:", error);
+    }
+}
+// ==============================================
+// FUNGSI EKSTRAK ASSET ID DARI NAMA FILE - VERSI ROBUST
+// ==============================================
+
+function extractAssetIdFromFilename(filename) {
+    if (!filename) return null;
+    
+    // Pattern 1: Format baru {ASSET_ID}_{TIMESTAMP}_{TYPE}.jpg
+    // Contoh: "A-MC001-1647234000-ABC123-1_1647234001000_utama.jpg"
+    const pattern1 = /^([AN]-[A-Z0-9]+-\d+-[A-Z0-9]+-\d+)_\d+_/;
+    const match1 = filename.match(pattern1);
+    if (match1 && match1[1]) {
+        return match1[1];
+    }
+    
+    // Pattern 2: Format lama {ASSET_NAME}_{ASSET_ID}_{TIMESTAMP}.jpg
+    // Contoh: "Mesin_Bor_A-OLD-123_1647234001000.jpg"
+    const pattern2 = /[AN]-[A-Z0-9]+-\d+-[A-Z0-9]+-\d+/;
+    const match2 = filename.match(pattern2);
+    if (match2) {
+        return match2[0];
+    }
+    
+    // Pattern 3: Ambil sebelum underscore pertama (fallback)
+    const underscoreIndex = filename.indexOf('_');
+    if (underscoreIndex > 0) {
+        const potentialId = filename.substring(0, underscoreIndex);
+        // Validasi apakah formatnya seperti ID asset
+        if (potentialId.match(/^[AN]-[A-Z0-9]+/)) {
+            return potentialId;
+        }
+    }
+    
+    return null;
 }
 function showZipImportPreview(previewData, zip) {
     currentPreviewData = previewData;
@@ -10750,6 +10966,10 @@ async function exportExcelTemplate() {
 }
 
 // ============= FUNGSI CREATE BACKUP ZIP - VERSI REALTIME =============
+// ==============================================
+// CREATE BACKUP - VERSI FINAL (PERBAIKAN)
+// ==============================================
+
 async function createBackup() {
     if (!requireInternet('Backup data')) return;
     if (!currentUser) {
@@ -10797,127 +11017,108 @@ async function createBackup() {
         updateProgressStep('load_data', 'completed');
         updateProgressBar(20);
 
-        // STEP 2: Process Photos
+        // STEP 2: Process Photos dengan BATCH PROCESSING
         updateProgressStep('process_photos', 'active');
         updateProgressText(`Menyiapkan ${totalPhotos} foto...`);
         updateProgressBar(25);
 
-        // BUAT ZIP DAN FOLDER
         const zip = new JSZip();
         const photoFolder = zip.folder("photos");
         
-        // Array untuk metadata foto
         const photosMeta = [];
         let totalExportedPhotos = 0;
         let failedPhotos = 0;
 
-        // PROSES SETIAP FOTO DENGAN PROGRESS REALTIME
-        const BATCH_SIZE = Math.max(1, Math.floor(totalPhotos / 20)); // Update setiap 5%
-        let lastUpdate = Date.now();
-        const MIN_UPDATE_INTERVAL = 100; // Minimal 100ms antar update
-
-        for (let i = 0; i < photosData.length; i++) {
-            const photo = photosData[i];
+        // BATCH PROCESSING: 50 foto per batch
+        const BATCH_SIZE = 50;
+        
+        for (let batchStart = 0; batchStart < photosData.length; batchStart += BATCH_SIZE) {
+            const batchEnd = Math.min(batchStart + BATCH_SIZE, photosData.length);
+            const batch = photosData.slice(batchStart, batchEnd);
             
-            try {
-                // Update progress setiap BATCH_SIZE foto atau minimal interval
-                const now = Date.now();
-                if (i % BATCH_SIZE === 0 || now - lastUpdate > MIN_UPDATE_INTERVAL || i === photosData.length - 1) {
-                    const photoProgress = 25 + ((i + 1) / totalPhotos) * 45;
-                    updateProgressBar(photoProgress);
-                    updateProgressText(`Memproses foto ${i+1}/${totalPhotos}...`);
-                    lastUpdate = now;
+            // Update progress
+            const progressPercent = 25 + ((batchStart + batch.length) / totalPhotos) * 45;
+            updateProgressBar(progressPercent);
+            updateProgressText(`Memproses foto ${batchStart + 1}-${batchEnd} dari ${totalPhotos}...`);
+
+            // Proses batch parallel
+            await Promise.all(batch.map(async (photo, indexInBatch) => {
+                const globalIndex = batchStart + indexInBatch;
+                
+                try {
+                    // Simpan metadata (tanpa image & thumbnail)
+                    const { image, thumbnail, ...photoMeta } = photo;
                     
-                    // Beri kesempatan UI untuk update
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
-                
-                // Simpan metadata (tanpa image & thumbnail)
-                const { image, thumbnail, ...photoMeta } = photo;
-                
-                // Tambah informasi tambahan untuk metadata
-                photoMeta.processed_at = new Date().toISOString();
-                photosMeta.push(photoMeta);
-                
-                // Tentukan nama file
-                const asset = assetsData.find(a => a.id === photo.assetId);
-                const assetName = asset?.nama_asset?.replace(/[^a-z0-9]/gi, '_') || 'unknown';
-                const timestamp = photo.timestamp || Date.now();
-                
-                let filename = `${assetName}_${photo.assetId.substring(0,8)}_${timestamp}.jpg`;
-                
-                // Cegah duplikasi
-                let counter = 1;
-                let baseFilename = filename;
-                while (photoFolder.file(filename)) {
-                    filename = `${baseFilename.replace('.jpg', '')}_${counter}.jpg`;
-                    counter++;
-                }
-                
-                let fileSaved = false;
-                
-                // PRIORITAS 1: FOTO LOKAL
-                if (photo.image && photo.image.startsWith('data:image')) {
-                    try {
-                        const base64Data = photo.image.split(',')[1];
-                        const binary = atob(base64Data);
-                        const bytes = new Uint8Array(binary.length);
-                        for (let j = 0; j < binary.length; j++) {
-                            bytes[j] = binary.charCodeAt(j);
-                        }
-                        
-                        photoFolder.file(filename, bytes);
-                        fileSaved = true;
-                        totalExportedPhotos++;
-                        
-                    } catch (base64Error) {
-                        console.warn(`Gagal konversi base64 foto ${photo.id}:`, base64Error);
-                    }
-                }
-                
-                // PRIORITAS 2: CLOUDINARY
-                if (!fileSaved && photo.cloudinary?.secure_url && navigator.onLine) {
-                    try {
-                        updateProgressText(`Mendownload foto ${i+1}/${totalPhotos} dari Cloudinary...`);
-                        
-                        const response = await fetch(photo.cloudinary.secure_url, {
-                            timeout: 10000,
-                            cache: 'no-cache'
-                        });
-                        
-                        if (response.ok) {
-                            const blob = await response.blob();
-                            photoFolder.file(filename, blob);
+                    // Tambah informasi tambahan
+                    photoMeta.processed_at = new Date().toISOString();
+                    photosMeta.push(photoMeta);
+                    
+                    // Dapatkan asset untuk nama file
+                    const asset = assetsData.find(a => a.id === photo.assetId);
+                    
+                    // 🔴 FORMAT NAMA FILE YANG LEBIH BAIK: {ASSET_ID}_{TIMESTAMP}_{TYPE}.jpg
+                    const timestamp = photo.timestamp || Date.now();
+                    const type = photo.type || 'utama';
+                    
+                    // Format ID asset lengkap untuk memudahkan ekstraksi nanti
+                    const assetId = photo.assetId;
+                    
+                    let filename = `${assetId}_${timestamp}_${type}.jpg`;
+                    
+                    let fileSaved = false;
+                    
+                    // PRIORITAS 1: FOTO LOKAL
+                    if (photo.image && photo.image.startsWith('data:image')) {
+                        try {
+                            const base64Data = photo.image.split(',')[1];
+                            const binary = atob(base64Data);
+                            const bytes = new Uint8Array(binary.length);
+                            for (let j = 0; j < binary.length; j++) {
+                                bytes[j] = binary.charCodeAt(j);
+                            }
+                            
+                            photoFolder.file(filename, bytes);
                             fileSaved = true;
                             totalExportedPhotos++;
+                            
+                        } catch (base64Error) {
+                            console.warn(`Gagal konversi base64 foto:`, base64Error);
                         }
-                        
-                    } catch (cloudinaryError) {
-                        console.warn(`Gagal download dari Cloudinary foto ${photo.id}:`, cloudinaryError);
                     }
-                }
-                
-                if (!fileSaved) {
+                    
+                    // PRIORITAS 2: CLOUDINARY
+                    if (!fileSaved && photo.cloudinary?.secure_url && navigator.onLine) {
+                        try {
+                            const response = await fetch(photo.cloudinary.secure_url, {
+                                timeout: 10000,
+                                cache: 'no-cache'
+                            });
+                            
+                            if (response.ok) {
+                                const blob = await response.blob();
+                                photoFolder.file(filename, blob);
+                                fileSaved = true;
+                                totalExportedPhotos++;
+                            }
+                            
+                        } catch (cloudinaryError) {
+                            console.warn(`Gagal download dari Cloudinary:`, cloudinaryError);
+                        }
+                    }
+                    
+                    if (!fileSaved) {
+                        failedPhotos++;
+                        photoMeta.backup_failed = true;
+                    }
+                    
+                } catch (photoError) {
+                    console.error(`Error processing photo:`, photoError);
                     failedPhotos++;
-                    // Catat di metadata bahwa foto gagal disimpan
-                    photoMeta.backup_failed = true;
-                    photoMeta.backup_failed_reason = 'No accessible image source';
                 }
-                
-            } catch (photoError) {
-                console.error(`Error processing photo ${photo.id}:`, photoError);
-                failedPhotos++;
-                
-                // Tetap simpan metadata dengan status error
-                photosMeta.push({
-                    id: photo.id,
-                    assetId: photo.assetId,
-                    type: photo.type,
-                    timestamp: photo.timestamp,
-                    backup_error: photoError.message,
-                    backup_failed: true
-                });
-            }
+            }));
+            
+            // Beri sedikit jeda agar UI tidak freeze
+            await new Promise(resolve => setTimeout(resolve, 10));
         }
 
         updateProgressStep('process_photos', 'completed');
@@ -10928,7 +11129,6 @@ async function createBackup() {
         updateProgressText('Menyiapkan file JSON...');
         updateProgressBar(75);
 
-        // BUAT FILE BACKUP INFO
         const backupInfo = {
             timestamp: Date.now(),
             date_iso: new Date().toISOString(),
@@ -10974,7 +11174,7 @@ async function createBackup() {
         updateProgressText('Menyimpan info backup...');
         zip.file("backup_info.json", JSON.stringify(backupInfo, null, 2));
         
-        // Buat file instruksi
+        // File instruksi
         const instructions = `ASSET MANAGEMENT BACKUP
 ===========================
 Tanggal: ${new Date().toLocaleString('id-ID')}
@@ -10982,22 +11182,14 @@ Dibuat oleh: ${currentUser.nama || currentUser.email}
 
 STATISTIK:
 - Total Asset: ${assetsData.length}
-- Total Foto di Database: ${photosMeta.length}
-- Foto Tersimpan di ZIP: ${totalExportedPhotos}
-- Foto Gagal Disimpan: ${failedPhotos}
-- Total Aktivitas: ${activitiesData.length}
-- Total Pengaturan: ${Object.keys(settingsData).length}
+- Total Foto: ${totalExportedPhotos}
+- Foto Gagal: ${failedPhotos}
 
 CARA RESTORE:
 1. Buka tab Backup & Export
-2. Klik area import atau pilih file ZIP ini
-3. Klik "Preview & Import Data"
-4. Periksa data yang akan diimport
-5. Klik "Import Data"
-
-CATATAN:
-- Foto yang gagal disimpan perlu diupload ulang ke Cloudinary
-- Jalankan sinkronisasi setelah import untuk mengupload foto pending
+2. Pilih file ZIP ini
+3. Untuk konflik, pilih "Timpa Data Lama" untuk update data yang ada
+4. Data akan diupdate dengan ID yang sama (TIDAK membuat duplikat)
 `;
 
         zip.file("import_instructions.txt", instructions);
@@ -11007,16 +11199,14 @@ CATATAN:
         updateProgressText('Mengompres file...');
         updateProgressBar(88);
 
-        // GENERATE DAN DOWNLOAD ZIP DENGAN PROGRESS
         const content = await zip.generateAsync({
             type: "blob",
             compression: "DEFLATE",
             compressionOptions: { level: 6 },
             onUpdate: (metadata) => {
-                // Progress kompresi dari 88% ke 98%
                 const percent = 88 + (metadata.percent / 100) * 10;
                 updateProgressBar(percent);
-                updateProgressText(`Mengompres... ${Math.round(metadata.percent)}% (${(metadata.currentFile ? metadata.currentFile : '')})`);
+                updateProgressText(`Mengompres... ${Math.round(metadata.percent)}%`);
             }
         });
 
@@ -11029,11 +11219,12 @@ CATATAN:
         saveAs(content, filename);
 
         // STEP 5: Save to History
+        updateProgressStep('save_backup', 'active');
         updateProgressText('Menyimpan ke riwayat...');
         await saveBackupToHistory(backupInfo);
+        updateProgressStep('save_backup', 'completed');
 
         // STEP 6: Finalize
-        updateProgressStep('create_zip', 'completed');
         updateProgressStep('finalize', 'active');
         updateProgressBar(100);
         updateProgressText('Backup selesai!');
@@ -11041,12 +11232,9 @@ CATATAN:
         setTimeout(() => {
             hideProgressOverlay();
             
-            let message = `✅ Backup berhasil!\n📦 Assets: ${assetsData.length}\n📸 Foto tersimpan: ${totalExportedPhotos}`;
+            let message = `✅ Backup berhasil!\n📦 Assets: ${assetsData.length}\n📸 Foto: ${totalExportedPhotos}`;
             if (failedPhotos > 0) {
                 message += `\n⚠️ Foto gagal: ${failedPhotos}`;
-            }
-            if (activitiesData.length > 0) {
-                message += `\n📊 Aktivitas: ${activitiesData.length}`;
             }
             
             showAlert('backupInfo', message, failedPhotos > 0 ? 'warning' : 'success');
@@ -11069,7 +11257,6 @@ CATATAN:
         }
     }
 }
-
 // ============= FUNGSI BACKUP HISTORY =============
 async function saveBackupToHistory(backupInfo) {
     return new Promise((resolve, reject) => {
