@@ -5932,7 +5932,54 @@ function showEditProfileModal() {
         }
     });
 }
-
+async function verifyUserPassword(password) {
+    try {
+        // Cek apakah user login
+        const user = firebase.auth().currentUser;
+        
+        if (!user) {
+            return { 
+                success: false, 
+                message: 'Anda tidak login' 
+            };
+        }
+        
+        // Buat credential dengan email user + password input
+        const credential = firebase.auth.EmailAuthProvider.credential(
+            user.email,  // Email user yang sedang login
+            password     // Password yang diketik user
+        );
+        
+        // Verifikasi ke server Firebase
+        await user.reauthenticateWithCredential(credential);
+        
+        // Sukses!
+        return { 
+            success: true 
+        };
+        
+    } catch (error) {
+        console.error("Verifikasi gagal:", error);
+        
+        // Terjemahkan error Firebase ke bahasa Indonesia
+        let message = 'Password salah';
+        
+        if (error.code === 'auth/too-many-requests') {
+            message = 'Terlalu banyak percobaan. Coba lagi nanti.';
+        } else if (error.code === 'auth/network-request-failed') {
+            message = 'Masalah koneksi. Cek internet Anda.';
+        } else if (error.code === 'auth/user-mismatch') {
+            message = 'User tidak sesuai.';
+        } else if (error.code === 'auth/invalid-credential') {
+            message = 'Password salah.';
+        }
+        
+        return { 
+            success: false, 
+            message 
+        };
+    }
+    }
 function changePassword() {
     const modalHTML = `
         <div class="modal active" id="changePasswordModal">
